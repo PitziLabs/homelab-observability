@@ -1,0 +1,583 @@
+{
+  "uid": "firewalla-traffic-devices",
+  "title": "Traffic & Devices",
+  "description": "Network connection analysis, bandwidth estimation, and per-device activity breakdown",
+  "tags": ["firewalla", "traffic", "devices"],
+  "timezone": "browser",
+  "editable": true,
+  "graphTooltip": 1,
+  "schemaVersion": 39,
+  "version": 0,
+  "refresh": "30s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": ["10s", "30s", "1m", "5m", "15m"]
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "device_ip",
+        "type": "custom",
+        "label": "Device IP",
+        "description": "Filter by source device IP",
+        "query": "",
+        "current": {
+          "text": "All",
+          "value": "$__all",
+          "selected": true
+        },
+        "options": [
+          {
+            "text": "All",
+            "value": "$__all",
+            "selected": true
+          }
+        ],
+        "includeAll": true,
+        "allValue": ".+",
+        "multi": false
+      }
+    ]
+  },
+  "annotations": {
+    "list": []
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "row",
+      "title": "Connection Overview",
+      "gridPos": { "x": 0, "y": 0, "w": 24, "h": 1 },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Total Connections",
+      "gridPos": { "x": 0, "y": 1, "w": 6, "h": 4 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(count_over_time({log_source=\"zeek_conn\"} | json | line_format \"{{.log}}\" | json | __error__=\"\" | id_orig_h=~\"$device_ip\" [$__range]))",
+          "queryType": "instant"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "value": null, "color": "blue" }]
+          },
+          "unit": "short",
+          "color": { "mode": "thresholds" }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "auto",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Unique Destinations",
+      "description": "Distinct destination IPs contacted",
+      "gridPos": { "x": 6, "y": 1, "w": 6, "h": 4 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "count(sum by (id_resp_h) (count_over_time({log_source=\"zeek_conn\"} | json | line_format \"{{.log}}\" | json | __error__=\"\" | id_orig_h=~\"$device_ip\" [$__range])))",
+          "queryType": "instant"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "value": null, "color": "purple" }]
+          },
+          "unit": "short",
+          "color": { "mode": "thresholds" }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "auto",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Unique Source Devices",
+      "description": "Distinct source IPs making connections",
+      "gridPos": { "x": 12, "y": 1, "w": 6, "h": 4 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "count(sum by (id_orig_h) (count_over_time({log_source=\"zeek_conn\"} | json | line_format \"{{.log}}\" | json | __error__=\"\" | id_orig_h=~\"$device_ip\" [$__range])))",
+          "queryType": "instant"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "value": null, "color": "green" }]
+          },
+          "unit": "short",
+          "color": { "mode": "thresholds" }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "auto",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Connections/s",
+      "gridPos": { "x": 18, "y": 1, "w": 6, "h": 4 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate({log_source=\"zeek_conn\"} [5m]))",
+          "legendFormat": "conn/s"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "fillOpacity": 20,
+            "gradientMode": "scheme",
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": { "mode": "none", "group": "A" },
+            "axisPlacement": "auto",
+            "scaleDistribution": { "type": "linear" },
+            "thresholdsStyle": { "mode": "off" }
+          },
+          "color": { "mode": "palette-classic" },
+          "unit": "ops",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "value": null, "color": "green" }]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": { "mode": "single", "sort": "none" },
+        "legend": { "displayMode": "hidden" }
+      }
+    },
+    {
+      "id": 6,
+      "type": "row",
+      "title": "Device Activity",
+      "gridPos": { "x": 0, "y": 5, "w": 24, "h": 1 },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "id": 7,
+      "type": "table",
+      "title": "Top Devices by Connection Count",
+      "description": "Most active devices by number of network connections",
+      "gridPos": { "x": 0, "y": 6, "w": 12, "h": 10 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "topk(20, sum by (id_orig_h) (count_over_time({log_source=\"zeek_conn\"} | json | line_format \"{{.log}}\" | json | __error__=\"\" | id_orig_h=~\"$device_ip\" [$__range])))",
+          "queryType": "instant",
+          "legendFormat": "{{id_orig_h}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "align": "auto", "filterable": true },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "value": null, "color": "green" },
+              { "value": 5000, "color": "yellow" },
+              { "value": 20000, "color": "red" }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "id_orig_h" },
+            "properties": [
+              { "id": "displayName", "value": "Device IP" },
+              { "id": "links", "value": [
+                {
+                  "title": "Filter to this device",
+                  "url": "/d/firewalla-traffic-devices?var-device_ip=${__value.text}&${__url_time_range}",
+                  "targetBlank": false
+                }
+              ]}
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Value" },
+            "properties": [
+              { "id": "displayName", "value": "Connections" },
+              { "id": "custom.cellOptions", "value": { "type": "color-background", "mode": "gradient" } }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "sortBy": [{ "displayName": "Connections", "desc": true }],
+        "footer": { "show": false }
+      },
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": { "Time": true }
+          }
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "Top 5 Devices Over Time",
+      "description": "Connection rate for the most active devices",
+      "gridPos": { "x": 12, "y": 6, "w": 12, "h": 10 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "topk(5, sum by (id_orig_h) (rate({log_source=\"zeek_conn\"} | json | line_format \"{{.log}}\" | json | __error__=\"\" | id_orig_h=~\"$device_ip\" [5m])))",
+          "legendFormat": "{{id_orig_h}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": { "mode": "none", "group": "A" },
+            "axisPlacement": "auto",
+            "scaleDistribution": { "type": "linear" },
+            "thresholdsStyle": { "mode": "off" }
+          },
+          "color": { "mode": "palette-classic" },
+          "unit": "ops",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "value": null, "color": "green" }]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": { "displayMode": "list", "placement": "bottom", "calcs": [] }
+      }
+    },
+    {
+      "id": 9,
+      "type": "row",
+      "title": "Destinations & Protocols",
+      "gridPos": { "x": 0, "y": 16, "w": 24, "h": 1 },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "id": 10,
+      "type": "table",
+      "title": "Top Destination IPs",
+      "description": "Most contacted remote hosts",
+      "gridPos": { "x": 0, "y": 17, "w": 12, "h": 10 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "topk(20, sum by (id_resp_h) (count_over_time({log_source=\"zeek_conn\"} | json | line_format \"{{.log}}\" | json | __error__=\"\" | id_orig_h=~\"$device_ip\" [$__range])))",
+          "queryType": "instant",
+          "legendFormat": "{{id_resp_h}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "align": "auto", "filterable": true }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "id_resp_h" },
+            "properties": [
+              { "id": "displayName", "value": "Destination IP" },
+              { "id": "custom.width", "value": 200 }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Value" },
+            "properties": [
+              { "id": "displayName", "value": "Connections" }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "sortBy": [{ "displayName": "Connections", "desc": true }],
+        "footer": { "show": false }
+      },
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": { "Time": true }
+          }
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "type": "piechart",
+      "title": "Connections by Protocol",
+      "description": "TCP, UDP, ICMP breakdown",
+      "gridPos": { "x": 12, "y": 17, "w": 6, "h": 10 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (proto) (count_over_time({log_source=\"zeek_conn\"} | json | line_format \"{{.log}}\" | json | __error__=\"\" | id_orig_h=~\"$device_ip\" [$__range]))",
+          "queryType": "instant",
+          "legendFormat": "{{proto}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "pieType": "donut",
+        "tooltip": { "mode": "single", "sort": "none" },
+        "legend": { "displayMode": "list", "placement": "bottom", "values": ["percent"] }
+      }
+    },
+    {
+      "id": 12,
+      "type": "table",
+      "title": "Top Destination Ports",
+      "description": "Most contacted service ports",
+      "gridPos": { "x": 18, "y": 17, "w": 6, "h": 10 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "topk(15, sum by (id_resp_p) (count_over_time({log_source=\"zeek_conn\"} | json | line_format \"{{.log}}\" | json | __error__=\"\" | id_orig_h=~\"$device_ip\" [$__range])))",
+          "queryType": "instant",
+          "legendFormat": "{{id_resp_p}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "align": "auto", "filterable": true }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "id_resp_p" },
+            "properties": [
+              { "id": "displayName", "value": "Port" }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Value" },
+            "properties": [
+              { "id": "displayName", "value": "Connections" }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "sortBy": [{ "displayName": "Connections", "desc": true }],
+        "footer": { "show": false }
+      },
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": { "Time": true }
+          }
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "type": "row",
+      "title": "Bandwidth Estimation",
+      "gridPos": { "x": 0, "y": 27, "w": 24, "h": 1 },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "id": 14,
+      "type": "table",
+      "title": "Top Devices by Estimated Bytes (orig_bytes + resp_bytes)",
+      "description": "Bandwidth estimation from Zeek conn.log — shows orig_bytes + resp_bytes per device. Note: Zeek may report '-' for bytes on some connections, which are excluded.",
+      "gridPos": { "x": 0, "y": 28, "w": 12, "h": 10 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "topk(15, sum by (id_orig_h) (sum_over_time({log_source=\"zeek_conn\"} | json | line_format \"{{.log}}\" | json | __error__=\"\" | id_orig_h=~\"$device_ip\" | unwrap orig_bytes [$__range])))",
+          "queryType": "instant",
+          "legendFormat": "{{id_orig_h}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "align": "auto", "filterable": true },
+          "unit": "decbytes",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "value": null, "color": "green" },
+              { "value": 104857600, "color": "yellow" },
+              { "value": 1073741824, "color": "red" }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "id_orig_h" },
+            "properties": [
+              { "id": "displayName", "value": "Device IP" },
+              { "id": "unit", "value": "string" },
+              { "id": "links", "value": [
+                {
+                  "title": "Filter to this device",
+                  "url": "/d/firewalla-traffic-devices?var-device_ip=${__value.text}&${__url_time_range}",
+                  "targetBlank": false
+                }
+              ]}
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Value" },
+            "properties": [
+              { "id": "displayName", "value": "Bytes Sent" },
+              { "id": "custom.cellOptions", "value": { "type": "color-background", "mode": "gradient" } }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "sortBy": [{ "displayName": "Bytes Sent", "desc": true }],
+        "footer": { "show": false }
+      },
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": { "Time": true }
+          }
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "type": "table",
+      "title": "Top Destinations by Bytes Received",
+      "description": "Remote hosts sending the most data to your network",
+      "gridPos": { "x": 12, "y": 28, "w": 12, "h": 10 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "topk(15, sum by (id_resp_h) (sum_over_time({log_source=\"zeek_conn\"} | json | line_format \"{{.log}}\" | json | __error__=\"\" | id_orig_h=~\"$device_ip\" | unwrap resp_bytes [$__range])))",
+          "queryType": "instant",
+          "legendFormat": "{{id_resp_h}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "align": "auto", "filterable": true },
+          "unit": "decbytes",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "value": null, "color": "green" },
+              { "value": 104857600, "color": "yellow" },
+              { "value": 1073741824, "color": "red" }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "id_resp_h" },
+            "properties": [
+              { "id": "displayName", "value": "Destination IP" },
+              { "id": "unit", "value": "string" }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Value" },
+            "properties": [
+              { "id": "displayName", "value": "Bytes Received" },
+              { "id": "custom.cellOptions", "value": { "type": "color-background", "mode": "gradient" } }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "sortBy": [{ "displayName": "Bytes Received", "desc": true }],
+        "footer": { "show": false }
+      },
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": { "Time": true }
+          }
+        }
+      ]
+    }
+  ]
+}

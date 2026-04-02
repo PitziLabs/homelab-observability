@@ -56,9 +56,10 @@ scrape_configs:
         replacement: blackbox:9115
 
   # node_exporter — host-level metrics for Proxmox nodes
-  # Uncomment after deploying node_exporter on each Proxmox host (session 2)
-  # - job_name: "node"
-  #   static_configs:
-  #     - targets:
-  #         - 192.168.1.10:9100    # pve (Proxmox node 1)
-  #         - 192.168.1.11:9100    # pve2 (Proxmox node 2)
+  - job_name: "node"
+    static_configs:
+      - targets:
+          # ---- UPDATE THESE IPs TO MATCH YOUR NETWORK ----
+          - 192.168.1.10:9100    # pve (Proxmox node 1)
+          - 192.168.1.11:9100    # pve2 (Proxmox node 2)
+          # ---- UPDATE THESE IPs TO MATCH YOUR NETWORK ----

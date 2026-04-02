@@ -53,6 +53,14 @@ scrape_configs:
       - target_label: __address__
         replacement: blackbox:9115
 
+  # --- Home Assistant entity metrics ---
+  - job_name: "homeassistant"
+    scrape_interval: 60s
+    metrics_path: /api/prometheus
+    bearer_token_file: /etc/prometheus/ha_token
+    static_configs:
+      - targets: ["192.168.139.172:8123"]
+
   # node_exporter — host-level metrics for Proxmox nodes
   - job_name: "node"
     static_configs:

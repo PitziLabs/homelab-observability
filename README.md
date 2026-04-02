@@ -130,6 +130,25 @@ docker compose exec prometheus kill -HUP 1
 
 > **ZFS note**: ZFS metrics (`node_zfs_*`) are collected automatically when the ZFS kernel module is present. The ZFS ARC Hit Rate panel in the Infrastructure Health dashboard will show "No data" on hosts without ZFS pools — this is expected for pve. Only pve2 has ZFS.
 
+## Home Assistant Integration
+
+Home Assistant exports ~828 entity metrics via its built-in Prometheus integration. Prometheus scrapes these every 60 seconds.
+
+### Setup
+
+1. Enable the Prometheus integration in Home Assistant — add `prometheus:` to your `configuration.yaml` and restart HA
+2. Create a long-lived access token in HA: **Profile → Long-Lived Access Tokens → Create Token**
+3. Save the token to `prometheus/ha_token`:
+   ```bash
+   echo "YOUR_TOKEN" > prometheus/ha_token
+   ```
+4. Restart Prometheus to pick up the new scrape target:
+   ```bash
+   docker compose restart prometheus
+   ```
+
+The office display dashboard shows four smart home panels sourced from HA metrics: lights currently on, Sonos speaker reachability, battery levels, and printer toner levels.
+
 ## Project Structure
 
 ```
@@ -140,8 +159,9 @@ docker compose exec prometheus kill -HUP 1
 ├── loki/
 │   └── loki-config.yml
 ├── prometheus/
-│   ├── prometheus.yml          # Scrape config (ICMP + HTTP probes, node_exporter targets)
-│   └── blackbox.yml            # Blackbox exporter module definitions
+│   ├── prometheus.yml          # Scrape config (ICMP + HTTP probes, HA, node_exporter targets)
+│   ├── blackbox.yml            # Blackbox exporter module definitions
+│   └── ha_token.example        # Template for HA long-lived access token
 └── grafana/
     └── provisioning/
         ├── datasources/

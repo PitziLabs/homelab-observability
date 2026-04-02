@@ -14,6 +14,7 @@ Grafana visualizes everything through five provisioned dashboards, including a k
 - **Prometheus** — metrics collection (port 9090), 30-day retention
 - **blackbox_exporter** — ICMP and HTTP probes (port 9115)
 - **node_exporter 1.9.0** — host-level metrics on Proxmox bare-metal nodes (port 9100)
+- **Home Assistant Prometheus** — ~828 entity metrics scraped every 60s from HA's built-in `/api/prometheus` endpoint (bearer token auth)
 - **Docker Compose** — orchestration (Loki, Grafana, Prometheus, blackbox only)
 
 ## File Structure
@@ -23,6 +24,8 @@ docker-compose.yml                                  # Services: loki, grafana, p
 loki/loki-config.yml                                # Loki config (TSDB, 30-day retention)
 prometheus/prometheus.yml                           # Prometheus scrape config (blackbox relabeling, placeholder IPs)
 prometheus/blackbox.yml                             # Blackbox exporter module definitions (icmp, http_2xx)
+prometheus/ha_token                                 # HA long-lived access token (gitignored, not committed)
+prometheus/ha_token.example                         # Template for the HA token file
 grafana/provisioning/datasources/loki.yml           # Auto-provisioned Loki datasource
 grafana/provisioning/datasources/prometheus.yml     # Auto-provisioned Prometheus datasource
 grafana/provisioning/dashboards/dashboards.yml      # Dashboard provider config
@@ -59,6 +62,7 @@ Prometheus (running inside Docker) scrapes the bare-metal node_exporter endpoint
 - **Blackbox relabeling pattern**: `icmp_ping` and `http_probe` jobs rewrite `__address__` to `blackbox:9115` and preserve the original target as the `instance` label. This is the standard blackbox_exporter pattern.
 - **Placeholder IPs**: Target IPs in `prometheus/prometheus.yml` are placeholders — update to match your network. A `# ---- UPDATE THESE IPs ----` comment marks the target blocks.
 - **node job**: The `node` job in `prometheus.yml` targets `192.168.1.10:9100` (pve) and `192.168.1.11:9100` (pve2). Update these IPs after deploying node_exporter on your Proxmox hosts.
+- **homeassistant job**: Scrapes HA at `192.168.139.172:8123/api/prometheus` every 60s using `bearer_token_file`. Key metric families: `homeassistant_light_brightness_percent`, `homeassistant_sensor_battery_percent`, `homeassistant_entity_available`, `homeassistant_sensor_unit_percent`.
 
 ## Loki Query Patterns
 
@@ -78,7 +82,7 @@ Anonymous viewer access is enabled via `GF_AUTH_ANONYMOUS_ENABLED=true` and `GF_
 ## Office Display Dashboard
 
 `firewalla-office-display` is the kiosk-optimized dashboard for a wall-mounted screen. It mixes both datasources:
-- **Prometheus**: Device Status (ICMP), Services (HTTP), CPU gauges, RAM gauges, Network traffic, Ping latency
+- **Prometheus**: Device Status (ICMP), Services (HTTP), CPU gauges, RAM gauges, Network traffic, Ping latency, Lights On, Sonos status, Batteries, Printer Toner (via Home Assistant)
 - **Loki**: DNS query volume (`zeek_dns`), Blocked connections (`firewalla_acl`)
 
 Designed for 1920×1080, no scrolling, 30-grid-unit total height. All panels use `colorMode: "background"` with red/green thresholds for instant readability at a distance.

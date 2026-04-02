@@ -827,10 +827,174 @@
       }
     },
     {
+      "id": 30,
+      "type": "stat",
+      "title": "Lights On",
+      "gridPos": { "x": 0, "y": 19, "w": 4, "h": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "count(homeassistant_light_brightness_percent > 0) OR vector(0)",
+          "legendFormat": "Lights On",
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "value": null, "color": "#374151" },
+              { "value": 1, "color": "#3b82f6" }
+            ]
+          },
+          "color": { "mode": "thresholds" },
+          "unit": "none",
+          "noValue": "0"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto",
+        "textMode": "value",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center"
+      }
+    },
+    {
+      "id": 31,
+      "type": "stat",
+      "title": "Sonos",
+      "gridPos": { "x": 4, "y": 19, "w": 8, "h": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "homeassistant_entity_available{domain=\"media_player\"}",
+          "legendFormat": "{{friendly_name}}",
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": { "text": "OFFLINE", "color": "#ef4444", "index": 0 },
+                "1": { "text": "READY", "color": "#374151", "index": 1 }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "value": null, "color": "#374151" },
+              { "value": 0, "color": "#ef4444" },
+              { "value": 1, "color": "#374151" }
+            ]
+          },
+          "color": { "mode": "thresholds" },
+          "unit": "short",
+          "noValue": "—"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center"
+      }
+    },
+    {
+      "id": 32,
+      "type": "gauge",
+      "title": "Batteries",
+      "gridPos": { "x": 12, "y": 19, "w": 6, "h": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "homeassistant_sensor_battery_percent",
+          "legendFormat": "{{friendly_name}}",
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "value": null, "color": "#ef4444" },
+              { "value": 20, "color": "#fbbf24" },
+              { "value": 50, "color": "#34d399" }
+            ]
+          },
+          "color": { "mode": "thresholds" },
+          "noValue": "—"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      }
+    },
+    {
+      "id": 33,
+      "type": "gauge",
+      "title": "Toner",
+      "gridPos": { "x": 18, "y": 19, "w": 6, "h": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "label_replace(homeassistant_sensor_unit_percent{entity=~\"sensor.hp_color_laserjet.*cartridge.*\"}, \"short_name\", \"$1\", \"friendly_name\", \".*(Yellow|Cyan|Black|Magenta).*\")",
+          "legendFormat": "{{short_name}}",
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "value": null, "color": "#ef4444" },
+              { "value": 20, "color": "#fbbf24" },
+              { "value": 40, "color": "#34d399" }
+            ]
+          },
+          "color": { "mode": "thresholds" },
+          "noValue": "—"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      }
+    },
+    {
       "id": 9,
       "type": "timeseries",
       "title": "DNS Queries / min",
-      "gridPos": { "x": 0, "y": 19, "w": 12, "h": 7 },
+      "gridPos": { "x": 0, "y": 25, "w": 12, "h": 7 },
       "datasource": { "type": "loki", "uid": "loki" },
       "targets": [
         {
@@ -882,7 +1046,7 @@
       "id": 10,
       "type": "timeseries",
       "title": "Blocked / min",
-      "gridPos": { "x": 12, "y": 19, "w": 12, "h": 7 },
+      "gridPos": { "x": 12, "y": 25, "w": 12, "h": 7 },
       "datasource": { "type": "loki", "uid": "loki" },
       "targets": [
         {

@@ -5,7 +5,7 @@
 Firewalla log monitoring stack: Grafana + Loki + Prometheus running in Docker on a Proxmox LXC.
 Firewalla pushes Zeek logs (DNS, conn) and ACL alarm logs to Loki via syslog/HTTP.
 Prometheus scrapes blackbox_exporter for device reachability (ICMP) and service health (HTTP).
-Grafana visualizes everything through four provisioned dashboards.
+Grafana visualizes everything through five provisioned dashboards, including a kiosk-optimized office display.
 
 ## Stack
 
@@ -27,6 +27,7 @@ grafana/provisioning/datasources/loki.yml           # Auto-provisioned Loki data
 grafana/provisioning/datasources/prometheus.yml     # Auto-provisioned Prometheus datasource
 grafana/provisioning/dashboards/dashboards.yml      # Dashboard provider config
 grafana/provisioning/dashboards/*.json              # Dashboard definitions
+grafana/provisioning/playlists/playlists.yml        # Provisioned playlist for office display rotation
 scripts/deploy-node-exporter.sh                     # Idempotent node_exporter installer for Proxmox bare-metal hosts
 ```
 
@@ -67,6 +68,26 @@ Common query structure used across dashboards:
 ```
 
 Metric queries use `count_over_time`, `rate`, `sum_over_time` (with `unwrap` for byte fields).
+
+## Office Display Dashboard
+
+`firewalla-office-display` is the kiosk-optimized dashboard for a wall-mounted screen. It mixes both datasources:
+- **Prometheus**: Device Status (ICMP), Services (HTTP), CPU gauges, RAM gauges, Network traffic, Ping latency
+- **Loki**: DNS query volume (`zeek_dns`), Blocked connections (`firewalla_acl`)
+
+Designed for 1920×1080, no scrolling, 30-grid-unit total height. All panels use `colorMode: "background"` with red/green thresholds for instant readability at a distance.
+
+Kiosk URL:
+```
+http://<host>:3000/d/firewalla-office-display?kiosk&refresh=30s
+```
+
+Playlist rotation URL (after Grafana assigns the playlist an ID):
+```
+http://<host>:3000/playlists/play/<playlist-id>?kiosk
+```
+
+Instance IP filters in CPU/RAM gauge queries match `192.168.139.8.*` (pve) and `192.168.139.7.*` (pve2). Update these if your node_exporter IPs differ.
 
 ## Testing Changes
 

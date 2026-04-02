@@ -7,7 +7,7 @@ Self-hosted log monitoring for [Firewalla](https://firewalla.com) using Grafana 
 ```
 Firewalla ──syslog/HTTP──▶ Loki (3100) ──────────────────────▶ Grafana (3000)
                             │                                        │
-                         log store                             4 dashboards
+                         log store                             5 dashboards
                         (30-day TTL)
 
                          blackbox_exporter (9115)
@@ -26,6 +26,16 @@ Firewalla ──syslog/HTTP──▶ Loki (3100) ──────────�
                               net/fs          net/fs/ZFS
 ```
 
+Office Display data paths:
+
+```
+Firewalla Zeek/ACL ──► Loki ──────────────────────────┐
+                                                        ├──► Grafana ──► Office Display
+Prometheus ──► blackbox (ICMP/HTTP) ───────────────────┤
+           ──► node_exporter (pve) ────────────────────┤
+           ──► node_exporter (pve2) ───────────────────┘
+```
+
 ## Dashboards
 
 | Dashboard | Description |
@@ -34,6 +44,7 @@ Firewalla ──syslog/HTTP──▶ Loki (3100) ──────────�
 | **DNS & Security** | DNS query analysis, NXDOMAIN anomaly detection, blocked connections |
 | **Traffic & Devices** | Per-device connection breakdown, protocol mix, bandwidth estimation |
 | **Infrastructure Health** | Device reachability (ICMP), service health (HTTP), and latency trends |
+| **Office Display** | Kiosk-optimized wall display combining Prometheus metrics and Loki logs |
 
 The DNS & Security and Traffic & Devices dashboards include a **Device IP** filter for drilling into individual hosts.
 
@@ -136,12 +147,15 @@ docker compose exec prometheus kill -HUP 1
         ├── datasources/
         │   ├── loki.yml
         │   └── prometheus.yml
+        ├── playlists/
+        │   └── playlists.yml           # Provisioned playlist for office display rotation
         └── dashboards/
             ├── dashboards.yml
             ├── network-overview.json
             ├── dns-security.json
             ├── traffic-devices.json
-            └── infra-health.json
+            ├── infra-health.json
+            └── office-display.json     # Kiosk-optimized wall display
 ```
 
 ## Useful Commands
@@ -177,11 +191,37 @@ docker compose down
 
 ## Office Display / Kiosk Mode
 
-The **Infrastructure Health** dashboard is tagged `office-display` and is suitable for a wall monitor. Append `?kiosk&refresh=30s` to the Grafana dashboard URL to hide the navigation bar and auto-refresh every 30 seconds:
+The **Office Display** dashboard (`firewalla-office-display`) is purpose-built for a wall-mounted screen. It combines Prometheus metrics (ICMP device status, HTTP service health, CPU/RAM gauges, network throughput, ping latency) and Loki log queries (DNS query volume, blocked connections) into a single 1920×1080 layout with no scrolling.
+
+### Kiosk mode URL
 
 ```
-http://<host>:3000/d/firewalla-infra-health?kiosk&refresh=30s
+http://<host>:3000/d/firewalla-office-display?kiosk&refresh=30s
 ```
+
+Append `&inactive` to hide the kiosk exit controls after 5 seconds of inactivity.
+
+### Playlist rotation
+
+A provisioned playlist ("Office Display Rotation") cycles through all four dashboards every 60 seconds. After restarting Grafana, find the playlist ID at **Dashboards → Playlists**, then open:
+
+```
+http://<host>:3000/playlists/play/<playlist-id>?kiosk
+```
+
+To create it manually instead: go to **Dashboards → Playlists → New Playlist**, add the four dashboards, and set the interval to 60s.
+
+### Chromium / Raspberry Pi kiosk setup
+
+```bash
+chromium-browser --kiosk --app="http://<host>:3000/d/firewalla-office-display?kiosk&refresh=30s"
+```
+
+For playlist rotation replace the URL with the playlist play URL above.
+
+### Updating instance IP filters
+
+The CPU and RAM gauge panels filter by IP: `192.168.139.8.*` for pve and `192.168.139.7.*` for pve2. If these differ from your node_exporter targets, update the `instance=~` regex in `grafana/provisioning/dashboards/office-display.json` and restart Grafana.
 
 ## License
 

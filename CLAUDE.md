@@ -69,6 +69,12 @@ Common query structure used across dashboards:
 
 Metric queries use `count_over_time`, `rate`, `sum_over_time` (with `unwrap` for byte fields).
 
+## Anonymous Auth (Kiosk Mode)
+
+Anonymous viewer access is enabled via `GF_AUTH_ANONYMOUS_ENABLED=true` and `GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer` in `docker-compose.yml`. This allows Chromium running in kiosk mode to display dashboards without a login session.
+
+**This is appropriate for a LAN-only instance.** Do not enable anonymous auth on an internet-exposed Grafana deployment — unauthenticated users would have read access to all dashboards and data.
+
 ## Office Display Dashboard
 
 `firewalla-office-display` is the kiosk-optimized dashboard for a wall-mounted screen. It mixes both datasources:

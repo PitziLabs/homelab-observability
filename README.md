@@ -189,6 +189,18 @@ curl "http://localhost:9115/probe?target=http://192.168.1.13:8123&module=http_2x
 docker compose down
 ```
 
+## Kiosk / Wall Display
+
+Anonymous viewer auth is enabled by default (`GF_AUTH_ANONYMOUS_ENABLED=true`, `GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer`). This allows Chromium in kiosk mode to display dashboards without a login session. This stack is LAN-only — do not enable anonymous auth on an internet-exposed Grafana instance.
+
+The kiosk display hardware and OS-level autostart setup is documented in [PitziLabs/homelab-infra](https://github.com/PitziLabs/homelab-infra).
+
+### Kiosk URL
+
+```
+http://<host>:3000/d/<dashboard-uid>?kiosk&refresh=30s
+```
+
 ## Office Display / Kiosk Mode
 
 The **Office Display** dashboard (`firewalla-office-display`) is purpose-built for a wall-mounted screen. It combines Prometheus metrics (ICMP device status, HTTP service health, CPU/RAM gauges, network throughput, ping latency) and Loki log queries (DNS query volume, blocked connections) into a single 1920×1080 layout with no scrolling.

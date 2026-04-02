@@ -16,8 +16,14 @@ Firewalla ──syslog/HTTP──▶ Loki (3100) ──────────�
                  (devices)             (services)
                             │
                     Prometheus (9090) ──────────────────────────▶ Grafana (3000)
-                         metrics store
-                        (30-day TTL)
+                         metrics store      ▲
+                        (30-day TTL)        │
+                                    node_exporter (9100)
+                                    ┌───────┴───────┐
+                                  pve             pve2
+                              (bare-metal)    (bare-metal)
+                              CPU/mem/disk    CPU/mem/disk
+                              net/fs          net/fs/ZFS
 ```
 
 ## Dashboards
@@ -79,15 +85,51 @@ Firewalla logs arrive with a `log_source` label:
 | `zeek_conn` | Zeek connection logs |
 | `firewalla_acl` | Firewalla ACL block/alarm logs |
 
+## Node Exporter
+
+node_exporter collects system metrics from your bare-metal Proxmox hosts (CPU, memory, disk I/O, filesystem usage, network throughput, and ZFS ARC stats). It runs as a systemd service on each host — not inside Docker — because it needs direct access to `/proc`, `/sys`, and the ZFS kernel module.
+
+### Deploy
+
+```bash
+# Deploy to pve (node 1)
+scp scripts/deploy-node-exporter.sh root@<pve-ip>:/tmp/
+ssh root@<pve-ip> 'bash /tmp/deploy-node-exporter.sh'
+
+# Deploy to pve2 (node 2)
+scp scripts/deploy-node-exporter.sh root@<pve2-ip>:/tmp/
+ssh root@<pve2-ip> 'bash /tmp/deploy-node-exporter.sh'
+```
+
+The script is idempotent — safe to re-run. It handles download, user creation, systemd unit, and verification.
+
+### Verify
+
+```bash
+curl http://<host-ip>:9100/metrics | head
+```
+
+### After deployment
+
+Update the `node` job targets in `prometheus/prometheus.yml` with the real host IPs (marked with `# ---- UPDATE THESE IPs ----`), then reload Prometheus:
+
+```bash
+docker compose exec prometheus kill -HUP 1
+```
+
+> **ZFS note**: ZFS metrics (`node_zfs_*`) are collected automatically when the ZFS kernel module is present. The ZFS ARC Hit Rate panel in the Infrastructure Health dashboard will show "No data" on hosts without ZFS pools — this is expected for pve. Only pve2 has ZFS.
+
 ## Project Structure
 
 ```
 ├── docker-compose.yml
 ├── .env.example
+├── scripts/
+│   └── deploy-node-exporter.sh # Idempotent node_exporter installer for Proxmox hosts
 ├── loki/
 │   └── loki-config.yml
 ├── prometheus/
-│   ├── prometheus.yml          # Scrape config (ICMP + HTTP probes, node_exporter stub)
+│   ├── prometheus.yml          # Scrape config (ICMP + HTTP probes, node_exporter targets)
 │   └── blackbox.yml            # Blackbox exporter module definitions
 └── grafana/
     └── provisioning/

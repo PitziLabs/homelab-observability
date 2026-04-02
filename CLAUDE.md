@@ -13,7 +13,8 @@ Grafana visualizes everything through four provisioned dashboards.
 - **Grafana OSS 11.5.2** — dashboards (port 3000)
 - **Prometheus** — metrics collection (port 9090), 30-day retention
 - **blackbox_exporter** — ICMP and HTTP probes (port 9115)
-- **Docker Compose** — orchestration
+- **node_exporter 1.9.0** — host-level metrics on Proxmox bare-metal nodes (port 9100)
+- **Docker Compose** — orchestration (Loki, Grafana, Prometheus, blackbox only)
 
 ## File Structure
 
@@ -26,6 +27,7 @@ grafana/provisioning/datasources/loki.yml           # Auto-provisioned Loki data
 grafana/provisioning/datasources/prometheus.yml     # Auto-provisioned Prometheus datasource
 grafana/provisioning/dashboards/dashboards.yml      # Dashboard provider config
 grafana/provisioning/dashboards/*.json              # Dashboard definitions
+scripts/deploy-node-exporter.sh                     # Idempotent node_exporter installer for Proxmox bare-metal hosts
 ```
 
 ## Running
@@ -43,11 +45,19 @@ docker compose up -d
 - **Template variables**: DNS & Traffic dashboards use `$device_ip` for per-device filtering
 - Dashboard JSON files are Grafana schema v39 — do not add `__inputs` or `__requires` (provisioned, not imported)
 
+## node_exporter Deployment Model
+
+node_exporter runs as a bare-metal **systemd service** on each Proxmox host — not inside Docker. This is required because node_exporter needs direct access to `/proc`, `/sys`, and the ZFS kernel module to collect accurate host-level metrics (CPU, memory, disk I/O, filesystem, network, ZFS ARC).
+
+Deploy with `scripts/deploy-node-exporter.sh`: SCP it to each host and run it over SSH. The script is idempotent — re-running it is safe and will no-op if the correct version is already installed.
+
+Prometheus (running inside Docker) scrapes the bare-metal node_exporter endpoints directly over the host network. The `node` scrape job in `prometheus/prometheus.yml` targets port 9100 on each Proxmox host.
+
 ## Prometheus Scrape Config Conventions
 
 - **Blackbox relabeling pattern**: `icmp_ping` and `http_probe` jobs rewrite `__address__` to `blackbox:9115` and preserve the original target as the `instance` label. This is the standard blackbox_exporter pattern.
 - **Placeholder IPs**: Target IPs in `prometheus/prometheus.yml` are placeholders — update to match your network. A `# ---- UPDATE THESE IPs ----` comment marks the target blocks.
-- **node_exporter stub**: A commented-out `node` job in `prometheus.yml` targets `192.168.1.10:9100` and `192.168.1.11:9100` — uncomment after deploying node_exporter on Proxmox hosts (session 2).
+- **node job**: The `node` job in `prometheus.yml` targets `192.168.1.10:9100` (pve) and `192.168.1.11:9100` (pve2). Update these IPs after deploying node_exporter on your Proxmox hosts.
 
 ## Loki Query Patterns
 

@@ -353,10 +353,326 @@
       }
     },
     {
+      "id": 13,
+      "type": "row",
+      "title": "Host Metrics (node_exporter)",
+      "gridPos": { "x": 0, "y": 28, "w": 24, "h": 1 },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "id": 14,
+      "type": "timeseries",
+      "title": "CPU Usage",
+      "description": "CPU utilization (%) across all cores per host",
+      "gridPos": { "x": 0, "y": 29, "w": 12, "h": 7 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "100 - (avg by(instance) (irate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
+          "legendFormat": "{{instance}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "fillOpacity": 20,
+            "gradientMode": "scheme",
+            "spanNulls": false,
+            "showPoints": "never",
+            "stacking": { "mode": "none", "group": "A" },
+            "axisPlacement": "auto",
+            "scaleDistribution": { "type": "linear" },
+            "axisCenteredZero": false,
+            "hideFrom": { "tooltip": false, "vis": false, "legend": false },
+            "thresholdsStyle": { "mode": "off" }
+          },
+          "color": { "mode": "palette-classic" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "value": null, "color": "green" },
+              { "value": 60, "color": "yellow" },
+              { "value": 85, "color": "red" }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": ["mean", "max"]
+        }
+      }
+    },
+    {
+      "id": 15,
+      "type": "timeseries",
+      "title": "Memory Usage",
+      "description": "Memory utilization (%) per host",
+      "gridPos": { "x": 12, "y": 29, "w": 12, "h": 7 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "(1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100",
+          "legendFormat": "{{instance}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "fillOpacity": 20,
+            "gradientMode": "scheme",
+            "spanNulls": false,
+            "showPoints": "never",
+            "stacking": { "mode": "none", "group": "A" },
+            "axisPlacement": "auto",
+            "scaleDistribution": { "type": "linear" },
+            "axisCenteredZero": false,
+            "hideFrom": { "tooltip": false, "vis": false, "legend": false },
+            "thresholdsStyle": { "mode": "off" }
+          },
+          "color": { "mode": "palette-classic" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "value": null, "color": "green" },
+              { "value": 70, "color": "yellow" },
+              { "value": 90, "color": "red" }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": ["mean", "max"]
+        }
+      }
+    },
+    {
+      "id": 16,
+      "type": "timeseries",
+      "title": "Disk I/O",
+      "description": "Disk read/write throughput per device",
+      "gridPos": { "x": 0, "y": 36, "w": 12, "h": 7 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "irate(node_disk_read_bytes_total{device=~\"sd.*|nvme.*\"}[5m])",
+          "legendFormat": "{{instance}} {{device}} read"
+        },
+        {
+          "refId": "B",
+          "expr": "irate(node_disk_written_bytes_total{device=~\"sd.*|nvme.*\"}[5m])",
+          "legendFormat": "{{instance}} {{device}} write"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "gradientMode": "scheme",
+            "spanNulls": false,
+            "showPoints": "never",
+            "stacking": { "mode": "none", "group": "A" },
+            "axisPlacement": "auto",
+            "scaleDistribution": { "type": "linear" },
+            "axisCenteredZero": false,
+            "hideFrom": { "tooltip": false, "vis": false, "legend": false },
+            "thresholdsStyle": { "mode": "off" }
+          },
+          "color": { "mode": "palette-classic" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "value": null, "color": "green" }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": ["mean", "max"]
+        }
+      }
+    },
+    {
+      "id": 17,
+      "type": "gauge",
+      "title": "Filesystem Usage",
+      "description": "Root filesystem utilization (%) per host. Shows No data on hosts with no matching mount.",
+      "gridPos": { "x": 12, "y": 36, "w": 12, "h": 7 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "100 - (node_filesystem_avail_bytes{mountpoint=\"/\",fstype!=\"tmpfs\"} / node_filesystem_size_bytes{mountpoint=\"/\",fstype!=\"tmpfs\"} * 100)",
+          "legendFormat": "{{instance}} {{mountpoint}}",
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "value": null, "color": "green" },
+              { "value": 70, "color": "yellow" },
+              { "value": 85, "color": "red" }
+            ]
+          },
+          "color": { "mode": "thresholds" }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      }
+    },
+    {
+      "id": 18,
+      "type": "timeseries",
+      "title": "Network Traffic",
+      "description": "Network receive/transmit throughput per interface (excludes loopback and virtual interfaces)",
+      "gridPos": { "x": 0, "y": 43, "w": 12, "h": 7 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "irate(node_network_receive_bytes_total{device!~\"lo|veth.*|docker.*|br-.*\"}[5m])",
+          "legendFormat": "{{instance}} {{device}} rx"
+        },
+        {
+          "refId": "B",
+          "expr": "irate(node_network_transmit_bytes_total{device!~\"lo|veth.*|docker.*|br-.*\"}[5m])",
+          "legendFormat": "{{instance}} {{device}} tx"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "gradientMode": "scheme",
+            "spanNulls": false,
+            "showPoints": "never",
+            "stacking": { "mode": "none", "group": "A" },
+            "axisPlacement": "auto",
+            "scaleDistribution": { "type": "linear" },
+            "axisCenteredZero": false,
+            "hideFrom": { "tooltip": false, "vis": false, "legend": false },
+            "thresholdsStyle": { "mode": "off" }
+          },
+          "color": { "mode": "palette-classic" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "value": null, "color": "green" }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": ["mean", "max"]
+        }
+      }
+    },
+    {
+      "id": 19,
+      "type": "stat",
+      "title": "ZFS ARC Hit Rate",
+      "description": "ZFS ARC cache hit rate (%). Shows No data on hosts without ZFS pools — expected for pve; only pve2 has ZFS.",
+      "gridPos": { "x": 12, "y": 43, "w": 12, "h": 7 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "node_zfs_arcstats_hits / (node_zfs_arcstats_hits + node_zfs_arcstats_misses) * 100",
+          "legendFormat": "{{instance}}",
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "value": null, "color": "red" },
+              { "value": 80, "color": "yellow" },
+              { "value": 90, "color": "green" }
+            ]
+          },
+          "color": { "mode": "thresholds" }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      }
+    },
+    {
       "id": 11,
       "type": "row",
       "title": "Probe Details",
-      "gridPos": { "x": 0, "y": 28, "w": 24, "h": 1 },
+      "gridPos": { "x": 0, "y": 50, "w": 24, "h": 1 },
       "collapsed": false,
       "panels": []
     },
@@ -365,7 +681,7 @@
       "type": "table",
       "title": "All Probes — Current Status",
       "description": "Combined status and latency table for all ICMP and HTTP probes",
-      "gridPos": { "x": 0, "y": 29, "w": 24, "h": 7 },
+      "gridPos": { "x": 0, "y": 51, "w": 24, "h": 7 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "targets": [
         {

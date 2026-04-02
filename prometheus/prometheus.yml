@@ -20,13 +20,12 @@ scrape_configs:
       module: [icmp]
     static_configs:
       - targets:
-          - 192.168.139.1    # Firewalla
-          - 192.168.139.2    # RT6600ax
-          - 192.168.139.3    # MR2200ac
-          - 192.168.139.8    # pve
-          - 192.168.139.7    # pve2
-          - 192.168.139.12   # NAS
-          - 192.168.139.13   # Home Assistant
+          - 192.168.139.1      # firewalla
+          - 192.168.139.86     # ap-office (RT6600ax)
+          - 192.168.139.8      # pve
+          - 192.168.139.7      # pve2
+          - 192.168.139.203    # pluto (NAS)
+          - 192.168.139.172    # homeassistant
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
@@ -42,7 +41,7 @@ scrape_configs:
       module: [http_2xx]
     static_configs:
       - targets:
-          - http://192.168.139.13:8123  # Home Assistant
+          - http://192.168.139.172:8123  # Home Assistant
           - http://grafana:3000         # Grafana (Docker DNS)
           - http://loki:3100/ready      # Loki readiness (Docker DNS)
     relabel_configs:

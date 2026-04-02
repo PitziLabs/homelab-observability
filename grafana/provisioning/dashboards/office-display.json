@@ -1109,7 +1109,7 @@
         "x": 0,
         "y": 12,
         "w": 12,
-        "h": 7
+        "h": 6
       },
       "datasource": {
         "type": "prometheus",
@@ -1224,7 +1224,7 @@
         "x": 12,
         "y": 12,
         "w": 12,
-        "h": 7
+        "h": 6
       },
       "datasource": {
         "type": "prometheus",
@@ -1308,7 +1308,7 @@
       "title": "Lights On",
       "gridPos": {
         "x": 0,
-        "y": 19,
+        "y": 18,
         "w": 4,
         "h": 6
       },
@@ -1368,7 +1368,7 @@
       "title": "Sonos",
       "gridPos": {
         "x": 4,
-        "y": 19,
+        "y": 18,
         "w": 8,
         "h": 6
       },
@@ -1449,7 +1449,7 @@
       "title": "Batteries",
       "gridPos": {
         "x": 12,
-        "y": 19,
+        "y": 18,
         "w": 6,
         "h": 6
       },
@@ -1513,7 +1513,7 @@
       "title": "Toner",
       "gridPos": {
         "x": 18,
-        "y": 19,
+        "y": 18,
         "w": 6,
         "h": 6
       },
@@ -1577,9 +1577,9 @@
       "title": "DNS Queries / min",
       "gridPos": {
         "x": 0,
-        "y": 25,
+        "y": 24,
         "w": 12,
-        "h": 7
+        "h": 6
       },
       "datasource": {
         "type": "loki",
@@ -1657,9 +1657,9 @@
       "title": "Blocked / min",
       "gridPos": {
         "x": 12,
-        "y": 25,
+        "y": 24,
         "w": 12,
-        "h": 7
+        "h": 6
       },
       "datasource": {
         "type": "loki",

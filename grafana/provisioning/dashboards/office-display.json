@@ -1310,7 +1310,7 @@
         "x": 0,
         "y": 18,
         "w": 4,
-        "h": 6
+        "h": 5
       },
       "datasource": {
         "type": "prometheus",
@@ -1370,7 +1370,7 @@
         "x": 4,
         "y": 18,
         "w": 8,
-        "h": 6
+        "h": 5
       },
       "datasource": {
         "type": "prometheus",
@@ -1451,7 +1451,7 @@
         "x": 12,
         "y": 18,
         "w": 6,
-        "h": 6
+        "h": 5
       },
       "datasource": {
         "type": "prometheus",
@@ -1515,7 +1515,7 @@
         "x": 18,
         "y": 18,
         "w": 6,
-        "h": 6
+        "h": 5
       },
       "datasource": {
         "type": "prometheus",
@@ -1577,9 +1577,9 @@
       "title": "DNS Queries / min",
       "gridPos": {
         "x": 0,
-        "y": 24,
+        "y": 23,
         "w": 12,
-        "h": 6
+        "h": 5
       },
       "datasource": {
         "type": "loki",
@@ -1657,9 +1657,9 @@
       "title": "Blocked / min",
       "gridPos": {
         "x": 12,
-        "y": 24,
+        "y": 23,
         "w": 12,
-        "h": 6
+        "h": 5
       },
       "datasource": {
         "type": "loki",

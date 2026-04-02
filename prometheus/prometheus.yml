@@ -1,0 +1,64 @@
+global:
+  scrape_interval: 30s
+  evaluation_interval: 30s
+
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # Blackbox exporter metrics endpoint
+  - job_name: "blackbox_exporter"
+    static_configs:
+      - targets: ["blackbox:9115"]
+
+  # ICMP ping probes — device reachability
+  - job_name: "icmp_ping"
+    metrics_path: /probe
+    params:
+      module: [icmp]
+    static_configs:
+      - targets:
+          # ---- UPDATE THESE IPs TO MATCH YOUR NETWORK ----
+          - 192.168.1.1      # Firewalla Gold SE (gateway)
+          - 192.168.1.2      # Synology RT6600ax
+          - 192.168.1.3      # MR2200ac (or WRX560 after swap)
+          - 192.168.1.10     # pve (Proxmox node 1)
+          - 192.168.1.11     # pve2 (Proxmox node 2)
+          - 192.168.1.12     # DS214play NAS
+          - 192.168.1.13     # Home Assistant
+          # ---- UPDATE THESE IPs TO MATCH YOUR NETWORK ----
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox:9115
+
+  # HTTP 200 probes — service health
+  - job_name: "http_probe"
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets:
+          - http://192.168.1.13:8123    # Home Assistant — UPDATE IP TO MATCH YOUR NETWORK
+          - http://grafana:3000         # Grafana (Docker DNS)
+          - http://loki:3100/ready      # Loki readiness (Docker DNS)
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox:9115
+
+  # node_exporter — host-level metrics for Proxmox nodes
+  # Uncomment after deploying node_exporter on each Proxmox host (session 2)
+  # - job_name: "node"
+  #   static_configs:
+  #     - targets:
+  #         - 192.168.1.10:9100    # pve (Proxmox node 1)
+  #         - 192.168.1.11:9100    # pve2 (Proxmox node 2)

@@ -2,3 +2,7 @@
 grafana-data/
 loki-data/
 prometheus/ha_token
+prometheus-data/
+*.swp
+*~
+.DS_Store

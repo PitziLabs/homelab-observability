@@ -1,0 +1,211 @@
+<svg width="100%" viewBox="0 0 780 920" xmlns="http://www.w3.org/2000/svg">
+<style>
+  text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  .th { font-size: 14px; font-weight: 500; fill: #3d3d3a; }
+  .ts { font-size: 12px; font-weight: 400; fill: #73726c; }
+  .tl { font-size: 11px; font-weight: 400; fill: #93928c; }
+  .arr { stroke: #73726c; stroke-width: 1.5; }
+
+  .c-navy > rect { fill: #E4E8F0; stroke: #1a1a2e; }
+  .c-navy > text.th { fill: #1a1a2e; }
+  .c-navy > text.ts { fill: #3d5a80; }
+
+  .c-coral > rect { fill: #FAECE7; stroke: #993C1D; }
+  .c-coral > text.th { fill: #712B13; }
+  .c-coral > text.ts { fill: #993C1D; }
+
+  .c-amber > rect { fill: #FAEEDA; stroke: #854F0B; }
+  .c-amber > text.th { fill: #633806; }
+  .c-amber > text.ts { fill: #854F0B; }
+
+  .c-green > rect { fill: #EAF3DE; stroke: #3B6D11; }
+  .c-green > text.th { fill: #27500A; }
+  .c-green > text.ts { fill: #3B6D11; }
+
+  .c-blue > rect { fill: #E6F1FB; stroke: #185FA5; }
+  .c-blue > text.th { fill: #0C447C; }
+  .c-blue > text.ts { fill: #185FA5; }
+
+  .c-pink > rect { fill: #FBEAF0; stroke: #993556; }
+  .c-pink > text.th { fill: #72243E; }
+  .c-pink > text.ts { fill: #993556; }
+
+  .c-purple > rect { fill: #EEEDFE; stroke: #534AB7; }
+  .c-purple > text.th { fill: #3C3489; }
+  .c-purple > text.ts { fill: #534AB7; }
+</style>
+<defs>
+  <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+</defs>
+
+<!-- ==================== DATA SOURCES ==================== -->
+<text class="tl" x="390" y="16" text-anchor="middle">DATA SOURCES</text>
+
+<!-- Firewalla Gold SE -->
+<g class="c-coral">
+  <rect x="30" y="30" width="220" height="100" rx="8" stroke-width="0.5"/>
+  <text class="th" x="140" y="52" text-anchor="middle">Firewalla Gold SE</text>
+  <text class="ts" x="140" y="72" text-anchor="middle">192.168.139.1</text>
+  <text class="ts" x="140" y="90" text-anchor="middle">Fluent Bit + Zeek IDS</text>
+  <text class="ts" x="140" y="108" text-anchor="middle">dns.log, conn.log, acl-alarm.log</text>
+</g>
+
+<!-- Proxmox pve -->
+<g class="c-amber">
+  <rect x="280" y="30" width="210" height="100" rx="8" stroke-width="0.5"/>
+  <text class="th" x="385" y="52" text-anchor="middle">pve (Proxmox)</text>
+  <text class="ts" x="385" y="72" text-anchor="middle">192.168.139.8</text>
+  <text class="ts" x="385" y="90" text-anchor="middle">node_exporter :9100</text>
+  <text class="ts" x="385" y="108" text-anchor="middle">CPU / mem / disk / net</text>
+</g>
+
+<!-- Proxmox pve2 -->
+<g class="c-amber">
+  <rect x="520" y="30" width="210" height="100" rx="8" stroke-width="0.5"/>
+  <text class="th" x="625" y="52" text-anchor="middle">pve2 (Proxmox)</text>
+  <text class="ts" x="625" y="72" text-anchor="middle">192.168.139.7</text>
+  <text class="ts" x="625" y="90" text-anchor="middle">node_exporter :9100</text>
+  <text class="ts" x="625" y="108" text-anchor="middle">CPU / mem / disk / ZFS</text>
+</g>
+
+<!-- Home Assistant -->
+<g class="c-green">
+  <rect x="280" y="155" width="220" height="68" rx="8" stroke-width="0.5"/>
+  <text class="th" x="390" y="177" text-anchor="middle">Home Assistant</text>
+  <text class="ts" x="390" y="195" text-anchor="middle">192.168.139.172:8123</text>
+  <text class="ts" x="390" y="211" text-anchor="middle">/api/prometheus (bearer token)</text>
+</g>
+
+<!-- node_exporter annotation -->
+<text class="tl" x="625" y="148" text-anchor="middle">bare-metal systemd service</text>
+
+<!-- ==================== NETWORK BOUNDARY ==================== -->
+<line x1="40" y1="248" x2="740" y2="248" stroke="#73726c" stroke-width="0.5" stroke-dasharray="6 4"/>
+<text class="tl" x="390" y="265" text-anchor="middle">LAN only -- no inbound from internet</text>
+
+<!-- ==================== LXC CONTAINER ==================== -->
+<g class="c-navy">
+  <rect x="30" y="280" width="720" height="380" rx="20" stroke-width="0.5"/>
+  <text class="th" x="390" y="306" text-anchor="middle">Proxmox LXC 200 (192.168.139.20)</text>
+  <text class="ts" x="390" y="324" text-anchor="middle">Docker Compose</text>
+</g>
+
+<!-- Loki -->
+<g class="c-purple">
+  <rect x="60" y="345" width="220" height="80" rx="8" stroke-width="0.5"/>
+  <text class="th" x="170" y="367" text-anchor="middle">Loki 3.4.2</text>
+  <text class="ts" x="170" y="385" text-anchor="middle">:3100 (syslog + HTTP)</text>
+  <text class="ts" x="170" y="403" text-anchor="middle">TSDB · 30-day retention</text>
+  <text class="ts" x="170" y="417" text-anchor="middle">zeek_dns, zeek_conn, firewalla_acl</text>
+</g>
+
+<!-- Prometheus -->
+<g class="c-blue">
+  <rect x="310" y="345" width="220" height="80" rx="8" stroke-width="0.5"/>
+  <text class="th" x="420" y="367" text-anchor="middle">Prometheus</text>
+  <text class="ts" x="420" y="385" text-anchor="middle">:9090</text>
+  <text class="ts" x="420" y="403" text-anchor="middle">30-day retention</text>
+  <text class="ts" x="420" y="417" text-anchor="middle">ICMP + HTTP + node + HA</text>
+</g>
+
+<!-- blackbox_exporter -->
+<g class="c-blue">
+  <rect x="560" y="345" width="170" height="80" rx="8" stroke-width="0.5"/>
+  <text class="th" x="645" y="367" text-anchor="middle">blackbox_exporter</text>
+  <text class="ts" x="645" y="385" text-anchor="middle">:9115</text>
+  <text class="ts" x="645" y="403" text-anchor="middle">ICMP ping (devices)</text>
+  <text class="ts" x="645" y="417" text-anchor="middle">HTTP probes (services)</text>
+</g>
+
+<!-- Grafana -->
+<g class="c-pink">
+  <rect x="160" y="470" width="460" height="80" rx="8" stroke-width="0.5"/>
+  <text class="th" x="390" y="492" text-anchor="middle">Grafana OSS 11.5.2</text>
+  <text class="ts" x="390" y="510" text-anchor="middle">:3000 · anonymous auth (kiosk mode)</text>
+  <text class="ts" x="390" y="528" text-anchor="middle">provisioned datasources + dashboards</text>
+  <text class="ts" x="390" y="542" text-anchor="middle">queries Loki + Prometheus</text>
+</g>
+
+<!-- ==================== ARROWS: Sources → Stack ==================== -->
+
+<!-- Firewalla → Loki (syslog/HTTP) -->
+<line x1="140" y1="130" x2="170" y2="343" class="arr" marker-end="url(#arrow)"/>
+<text class="tl" x="100" y="240" text-anchor="start">syslog / HTTP</text>
+
+<!-- pve → Prometheus (scrape) -->
+<line x1="385" y1="130" x2="410" y2="343" class="arr" marker-end="url(#arrow)"/>
+
+<!-- pve2 → Prometheus (scrape) -->
+<line x1="625" y1="130" x2="440" y2="343" class="arr" marker-end="url(#arrow)"/>
+
+<!-- HA → Prometheus (scrape) -->
+<line x1="390" y1="223" x2="420" y2="343" class="arr" marker-end="url(#arrow)"/>
+
+<!-- Prometheus ↔ blackbox -->
+<line x1="530" y1="385" x2="558" y2="385" class="arr" marker-end="url(#arrow)"/>
+<text class="tl" x="544" y="378" text-anchor="middle">scrape</text>
+
+<!-- Loki → Grafana -->
+<line x1="170" y1="425" x2="280" y2="490" class="arr" marker-end="url(#arrow)"/>
+
+<!-- Prometheus → Grafana -->
+<line x1="420" y1="425" x2="420" y2="468" class="arr" marker-end="url(#arrow)"/>
+
+<!-- ==================== OUTPUTS ==================== -->
+<line x1="40" y1="680" x2="740" y2="680" stroke="#73726c" stroke-width="0.5" stroke-dasharray="6 4"/>
+<text class="tl" x="390" y="697" text-anchor="middle">DASHBOARDS</text>
+
+<!-- Dashboard boxes -->
+<g class="c-green">
+  <rect x="30" y="710" width="135" height="56" rx="8" stroke-width="0.5"/>
+  <text class="th" x="97" y="732" text-anchor="middle">Network</text>
+  <text class="ts" x="97" y="750" text-anchor="middle">Overview</text>
+</g>
+
+<g class="c-green">
+  <rect x="180" y="710" width="135" height="56" rx="8" stroke-width="0.5"/>
+  <text class="th" x="247" y="732" text-anchor="middle">DNS &amp;</text>
+  <text class="ts" x="247" y="750" text-anchor="middle">Security</text>
+</g>
+
+<g class="c-green">
+  <rect x="330" y="710" width="135" height="56" rx="8" stroke-width="0.5"/>
+  <text class="th" x="397" y="732" text-anchor="middle">Traffic &amp;</text>
+  <text class="ts" x="397" y="750" text-anchor="middle">Devices</text>
+</g>
+
+<g class="c-green">
+  <rect x="480" y="710" width="135" height="56" rx="8" stroke-width="0.5"/>
+  <text class="th" x="547" y="732" text-anchor="middle">Infrastructure</text>
+  <text class="ts" x="547" y="750" text-anchor="middle">Health</text>
+</g>
+
+<g class="c-pink">
+  <rect x="630" y="710" width="135" height="56" rx="8" stroke-width="0.5"/>
+  <text class="th" x="697" y="732" text-anchor="middle">Office Display</text>
+  <text class="ts" x="697" y="750" text-anchor="middle">kiosk 1920x1080</text>
+</g>
+
+<!-- Grafana → Dashboards -->
+<line x1="390" y1="550" x2="97" y2="708" class="arr" marker-end="url(#arrow)" stroke-dasharray="4 3"/>
+<line x1="390" y1="550" x2="247" y2="708" class="arr" marker-end="url(#arrow)" stroke-dasharray="4 3"/>
+<line x1="390" y1="550" x2="397" y2="708" class="arr" marker-end="url(#arrow)" stroke-dasharray="4 3"/>
+<line x1="390" y1="550" x2="547" y2="708" class="arr" marker-end="url(#arrow)" stroke-dasharray="4 3"/>
+<line x1="390" y1="550" x2="697" y2="708" class="arr" marker-end="url(#arrow)" stroke-dasharray="4 3"/>
+
+<!-- ==================== KIOSK NOTE ==================== -->
+<g class="c-coral">
+  <rect x="530" y="790" width="235" height="56" rx="8" stroke-width="0.5"/>
+  <text class="th" x="647" y="812" text-anchor="middle">Wall-mounted display</text>
+  <text class="ts" x="647" y="830" text-anchor="middle">Chromium kiosk · auto-refresh 30s</text>
+</g>
+
+<!-- Office Display → Kiosk -->
+<line x1="697" y1="766" x2="647" y2="788" class="arr" marker-end="url(#arrow)"/>
+
+<!-- ==================== LEGEND ==================== -->
+<text class="tl" x="30" y="880" text-anchor="start">Coral = Firewalla · Amber = Proxmox nodes · Green = Home Assistant / dashboards · Purple = Loki · Blue = Prometheus · Pink = Grafana</text>
+<text class="tl" x="30" y="900" text-anchor="start">Solid arrows = data flow · Dashed arrows = visualization</text>
+</svg>

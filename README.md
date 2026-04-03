@@ -1,8 +1,13 @@
 # Firewalla Grafana Stack
 
-Self-hosted log monitoring for [Firewalla](https://firewalla.com) using Grafana and Loki. Collects Zeek network logs (DNS, connections) and Firewalla ACL alarm logs, then visualizes them through three pre-built dashboards.
+Self-hosted log monitoring for [Firewalla](https://firewalla.com) using Grafana and Loki. Collects Zeek network logs (DNS, connections) and Firewalla ACL alarm logs, then visualizes them through five pre-built dashboards.
 
 ## Architecture
+
+![Architecture](docs/architecture.svg)
+
+<details>
+<summary>ASCII fallback</summary>
 
 ```
 Firewalla ──syslog/HTTP──▶ Loki (3100) ──────────────────────▶ Grafana (3000)
@@ -35,6 +40,8 @@ Prometheus ──► blackbox (ICMP/HTTP) ────────────�
            ──► node_exporter (pve) ────────────────────┤
            ──► node_exporter (pve2) ───────────────────┘
 ```
+
+</details>
 
 ## Dashboards
 

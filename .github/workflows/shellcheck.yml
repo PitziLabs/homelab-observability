@@ -1,0 +1,58 @@
+# ============================================================================
+# ShellCheck — Static Analysis for Shell Scripts
+# ============================================================================
+# Runs ShellCheck against all bash scripts on every PR.
+# Required status check for branch protection / auto-merge.
+# ============================================================================
+
+name: ShellCheck
+
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review, reopened]
+
+jobs:
+  shellcheck:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Run ShellCheck
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
+          echo "ShellCheck version: $(shellcheck --version | head -2 | tail -1)"
+          echo ""
+
+          # Discover all shell scripts in the repo
+          mapfile -t SCRIPTS < <(find . -name '*.sh' -not -path './.git/*' | sort)
+
+          if [ "${#SCRIPTS[@]}" -eq 0 ]; then
+            echo "No shell scripts found."
+            exit 0
+          fi
+
+          FAILED=0
+          for script in "${SCRIPTS[@]}"; do
+            echo "━━━ Checking $script ━━━"
+            if shellcheck --severity=warning --shell=bash "$script"; then
+              echo "✓ $script passed"
+            else
+              FAILED=1
+              echo "✗ $script has issues"
+            fi
+            echo ""
+          done
+
+          if [ "$FAILED" -eq 1 ]; then
+            echo "::error::ShellCheck found issues in one or more scripts."
+            exit 1
+          fi
+
+          echo "All scripts passed ShellCheck."

@@ -1305,11 +1305,11 @@
     {
       "id": 30,
       "type": "stat",
-      "title": "Lights On",
+      "title": "Lights",
       "gridPos": {
         "x": 0,
         "y": 18,
-        "w": 4,
+        "w": 8,
         "h": 5
       },
       "datasource": {
@@ -1319,13 +1319,35 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "count(homeassistant_light_brightness_percent > 0) OR vector(0)",
-          "legendFormat": "Lights On",
+          "expr": "homeassistant_light_brightness_percent",
+          "legendFormat": "{{friendly_name}}",
           "instant": true
         }
       ],
       "fieldConfig": {
         "defaults": {
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "OFF",
+                  "index": 0
+                }
+              }
+            },
+            {
+              "type": "range",
+              "options": {
+                "from": 1,
+                "to": 100,
+                "result": {
+                  "text": "${__value.raw}%",
+                  "index": 1
+                }
+              }
+            }
+          ],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -1335,7 +1357,7 @@
               },
               {
                 "value": 1,
-                "color": "#3b82f6"
+                "color": "#f59e0b"
               }
             ]
           },
@@ -1343,7 +1365,7 @@
             "mode": "thresholds"
           },
           "unit": "none",
-          "noValue": "0"
+          "noValue": "OFF"
         },
         "overrides": []
       },
@@ -1355,8 +1377,8 @@
           "fields": "",
           "values": false
         },
-        "orientation": "auto",
-        "textMode": "value",
+        "orientation": "horizontal",
+        "textMode": "value_and_name",
         "colorMode": "background",
         "graphMode": "none",
         "justifyMode": "center"
@@ -1367,9 +1389,9 @@
       "type": "stat",
       "title": "Sonos",
       "gridPos": {
-        "x": 4,
+        "x": 8,
         "y": 18,
-        "w": 8,
+        "w": 4,
         "h": 5
       },
       "datasource": {

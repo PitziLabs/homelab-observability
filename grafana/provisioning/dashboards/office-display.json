@@ -39,7 +39,7 @@
         "x": 0,
         "y": 0,
         "w": 4,
-        "h": 3
+        "h": 2
       },
       "datasource": {
         "type": "prometheus",
@@ -120,7 +120,7 @@
         "x": 4,
         "y": 0,
         "w": 4,
-        "h": 3
+        "h": 2
       },
       "datasource": {
         "type": "prometheus",
@@ -201,7 +201,7 @@
         "x": 8,
         "y": 0,
         "w": 4,
-        "h": 3
+        "h": 2
       },
       "datasource": {
         "type": "prometheus",
@@ -282,7 +282,7 @@
         "x": 12,
         "y": 0,
         "w": 4,
-        "h": 3
+        "h": 2
       },
       "datasource": {
         "type": "prometheus",
@@ -363,7 +363,7 @@
         "x": 16,
         "y": 0,
         "w": 4,
-        "h": 3
+        "h": 2
       },
       "datasource": {
         "type": "prometheus",
@@ -444,7 +444,7 @@
         "x": 20,
         "y": 0,
         "w": 4,
-        "h": 3
+        "h": 2
       },
       "datasource": {
         "type": "prometheus",
@@ -523,9 +523,9 @@
       "title": "Grafana",
       "gridPos": {
         "x": 0,
-        "y": 3,
+        "y": 2,
         "w": 4,
-        "h": 3
+        "h": 2
       },
       "datasource": {
         "type": "prometheus",
@@ -604,9 +604,9 @@
       "title": "Loki",
       "gridPos": {
         "x": 4,
-        "y": 3,
+        "y": 2,
         "w": 4,
-        "h": 3
+        "h": 2
       },
       "datasource": {
         "type": "prometheus",
@@ -685,9 +685,9 @@
       "title": "Home Assistant",
       "gridPos": {
         "x": 8,
-        "y": 3,
+        "y": 2,
         "w": 4,
-        "h": 3
+        "h": 2
       },
       "datasource": {
         "type": "prometheus",
@@ -766,9 +766,9 @@
       "title": "Network Health",
       "gridPos": {
         "x": 12,
-        "y": 3,
+        "y": 2,
         "w": 12,
-        "h": 3
+        "h": 2
       },
       "datasource": {
         "type": "prometheus",
@@ -835,9 +835,9 @@
       "title": "CPU pve",
       "gridPos": {
         "x": 0,
-        "y": 6,
+        "y": 4,
         "w": 6,
-        "h": 6
+        "h": 5
       },
       "datasource": {
         "type": "prometheus",
@@ -903,9 +903,9 @@
       "title": "CPU pve2",
       "gridPos": {
         "x": 6,
-        "y": 6,
+        "y": 4,
         "w": 6,
-        "h": 6
+        "h": 5
       },
       "datasource": {
         "type": "prometheus",
@@ -971,9 +971,9 @@
       "title": "RAM pve",
       "gridPos": {
         "x": 12,
-        "y": 6,
+        "y": 4,
         "w": 6,
-        "h": 6
+        "h": 5
       },
       "datasource": {
         "type": "prometheus",
@@ -1039,9 +1039,9 @@
       "title": "RAM pve2",
       "gridPos": {
         "x": 18,
-        "y": 6,
+        "y": 4,
         "w": 6,
-        "h": 6
+        "h": 5
       },
       "datasource": {
         "type": "prometheus",
@@ -1107,9 +1107,9 @@
       "title": "Network Traffic",
       "gridPos": {
         "x": 0,
-        "y": 12,
+        "y": 9,
         "w": 12,
-        "h": 6
+        "h": 8
       },
       "datasource": {
         "type": "prometheus",
@@ -1222,9 +1222,9 @@
       "title": "Ping Latency",
       "gridPos": {
         "x": 12,
-        "y": 12,
+        "y": 9,
         "w": 12,
-        "h": 6
+        "h": 8
       },
       "datasource": {
         "type": "prometheus",
@@ -1308,9 +1308,9 @@
       "title": "Lights",
       "gridPos": {
         "x": 0,
-        "y": 18,
+        "y": 17,
         "w": 8,
-        "h": 5
+        "h": 7
       },
       "datasource": {
         "type": "prometheus",
@@ -1335,17 +1335,6 @@
                   "index": 0
                 }
               }
-            },
-            {
-              "type": "range",
-              "options": {
-                "from": 1,
-                "to": 100,
-                "result": {
-                  "text": "${__value.raw}%",
-                  "index": 1
-                }
-              }
             }
           ],
           "thresholds": {
@@ -1364,7 +1353,7 @@
           "color": {
             "mode": "thresholds"
           },
-          "unit": "none",
+          "unit": "percent",
           "noValue": "OFF"
         },
         "overrides": []
@@ -1390,9 +1379,9 @@
       "title": "Sonos",
       "gridPos": {
         "x": 8,
-        "y": 18,
+        "y": 17,
         "w": 4,
-        "h": 5
+        "h": 7
       },
       "datasource": {
         "type": "prometheus",
@@ -1471,9 +1460,9 @@
       "title": "Batteries",
       "gridPos": {
         "x": 12,
-        "y": 18,
+        "y": 17,
         "w": 6,
-        "h": 5
+        "h": 7
       },
       "datasource": {
         "type": "prometheus",
@@ -1535,9 +1524,9 @@
       "title": "Toner",
       "gridPos": {
         "x": 18,
-        "y": 18,
+        "y": 17,
         "w": 6,
-        "h": 5
+        "h": 7
       },
       "datasource": {
         "type": "prometheus",
@@ -1599,9 +1588,9 @@
       "title": "DNS Queries / min",
       "gridPos": {
         "x": 0,
-        "y": 23,
+        "y": 24,
         "w": 12,
-        "h": 5
+        "h": 6
       },
       "datasource": {
         "type": "loki",
@@ -1679,9 +1668,9 @@
       "title": "Blocked / min",
       "gridPos": {
         "x": 12,
-        "y": 23,
+        "y": 24,
         "w": 12,
-        "h": 5
+        "h": 6
       },
       "datasource": {
         "type": "loki",

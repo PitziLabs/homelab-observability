@@ -837,7 +837,7 @@
         "x": 0,
         "y": 4,
         "w": 6,
-        "h": 5
+        "h": 4
       },
       "datasource": {
         "type": "prometheus",
@@ -905,7 +905,7 @@
         "x": 6,
         "y": 4,
         "w": 6,
-        "h": 5
+        "h": 4
       },
       "datasource": {
         "type": "prometheus",
@@ -973,7 +973,7 @@
         "x": 12,
         "y": 4,
         "w": 6,
-        "h": 5
+        "h": 4
       },
       "datasource": {
         "type": "prometheus",
@@ -1041,7 +1041,7 @@
         "x": 18,
         "y": 4,
         "w": 6,
-        "h": 5
+        "h": 4
       },
       "datasource": {
         "type": "prometheus",
@@ -1107,9 +1107,9 @@
       "title": "Network Traffic",
       "gridPos": {
         "x": 0,
-        "y": 9,
+        "y": 8,
         "w": 12,
-        "h": 8
+        "h": 7
       },
       "datasource": {
         "type": "prometheus",
@@ -1222,9 +1222,9 @@
       "title": "Ping Latency",
       "gridPos": {
         "x": 12,
-        "y": 9,
+        "y": 8,
         "w": 12,
-        "h": 8
+        "h": 7
       },
       "datasource": {
         "type": "prometheus",
@@ -1308,9 +1308,9 @@
       "title": "Lights",
       "gridPos": {
         "x": 0,
-        "y": 17,
-        "w": 8,
-        "h": 7
+        "y": 15,
+        "w": 16,
+        "h": 6
       },
       "datasource": {
         "type": "prometheus",
@@ -1378,10 +1378,10 @@
       "type": "stat",
       "title": "Sonos",
       "gridPos": {
-        "x": 8,
-        "y": 17,
-        "w": 4,
-        "h": 7
+        "x": 16,
+        "y": 15,
+        "w": 8,
+        "h": 6
       },
       "datasource": {
         "type": "prometheus",
@@ -1455,142 +1455,14 @@
       }
     },
     {
-      "id": 32,
-      "type": "gauge",
-      "title": "Batteries",
-      "gridPos": {
-        "x": 12,
-        "y": 17,
-        "w": 6,
-        "h": 7
-      },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "homeassistant_sensor_battery_percent",
-          "legendFormat": "{{friendly_name}}",
-          "instant": true
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percent",
-          "min": 0,
-          "max": 100,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "value": null,
-                "color": "#ef4444"
-              },
-              {
-                "value": 20,
-                "color": "#fbbf24"
-              },
-              {
-                "value": 50,
-                "color": "#34d399"
-              }
-            ]
-          },
-          "color": {
-            "mode": "thresholds"
-          },
-          "noValue": "\u2014"
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "orientation": "auto",
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
-      }
-    },
-    {
-      "id": 33,
-      "type": "gauge",
-      "title": "Toner",
-      "gridPos": {
-        "x": 18,
-        "y": 17,
-        "w": 6,
-        "h": 7
-      },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "label_replace(homeassistant_sensor_unit_percent{entity=~\"sensor.hp_color_laserjet.*cartridge.*\"}, \"short_name\", \"$1\", \"friendly_name\", \".*(Yellow|Cyan|Black|Magenta).*\")",
-          "legendFormat": "{{short_name}}",
-          "instant": true
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percent",
-          "min": 0,
-          "max": 100,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "value": null,
-                "color": "#ef4444"
-              },
-              {
-                "value": 20,
-                "color": "#fbbf24"
-              },
-              {
-                "value": 40,
-                "color": "#34d399"
-              }
-            ]
-          },
-          "color": {
-            "mode": "thresholds"
-          },
-          "noValue": "\u2014"
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "orientation": "auto",
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
-      }
-    },
-    {
       "id": 9,
       "type": "timeseries",
       "title": "DNS Queries / min",
       "gridPos": {
         "x": 0,
-        "y": 24,
+        "y": 21,
         "w": 12,
-        "h": 6
+        "h": 5
       },
       "datasource": {
         "type": "loki",
@@ -1668,9 +1540,9 @@
       "title": "Blocked / min",
       "gridPos": {
         "x": 12,
-        "y": 24,
+        "y": 21,
         "w": 12,
-        "h": 6
+        "h": 5
       },
       "datasource": {
         "type": "loki",

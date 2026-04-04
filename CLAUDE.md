@@ -82,10 +82,10 @@ Anonymous viewer access is enabled via `GF_AUTH_ANONYMOUS_ENABLED=true` and `GF_
 ## Office Display Dashboard
 
 `firewalla-office-display` is the kiosk-optimized dashboard for a wall-mounted screen. It mixes both datasources:
-- **Prometheus**: Device Status (ICMP), Services (HTTP), CPU gauges, RAM gauges, Network traffic, Ping latency, Lights On, Sonos status, Batteries, Printer Toner (via Home Assistant)
+- **Prometheus**: Device Status (ICMP), Services (HTTP), CPU gauges, RAM gauges, Network traffic, Ping latency, Lights On, Sonos status (via Home Assistant)
 - **Loki**: DNS query volume (`zeek_dns`), Blocked connections (`firewalla_acl`)
 
-Designed for 1920×1080, no scrolling, 30-grid-unit total height (all units used). All panels use `colorMode: "background"` with red/green thresholds for instant readability at a distance.
+Designed for 1920×1080, no scrolling, 26-grid-unit total height (fits within kiosk viewport including Grafana's inter-panel margins and dashboard padding). All panels use `colorMode: "background"` with red/green thresholds for instant readability at a distance.
 
 Kiosk URL:
 ```

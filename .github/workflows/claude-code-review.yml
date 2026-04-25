@@ -73,4 +73,5 @@ jobs:
             - If nothing significant is wrong, say so in one sentence
           claude_args: |
             --max-turns 15
+            --model haiku
             --allowedTools "Bash(gh pr diff:*),Bash(gh pr view:*),Read"

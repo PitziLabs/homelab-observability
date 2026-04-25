@@ -1,8 +1,8 @@
 # ============================================================================
 # Claude Code — Automated PR Review
 # ============================================================================
-# Runs automatically on every non-draft PR. Read-only review focused on
-# stack correctness, Docker Compose safety, and configuration quality.
+# Thin wrapper around PitziLabs/shared-workflows/claude-review.yml.
+# Pinned to Haiku.
 # ============================================================================
 
 name: Claude Code Review
@@ -18,59 +18,28 @@ on:
 
 jobs:
   claude-review:
-    if: github.event.pull_request.draft == false
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
-      issues: write
-      id-token: write
+    uses: PitziLabs/shared-workflows/.github/workflows/claude-review.yml@main
+    secrets: inherit
+    with:
+      review_prompt: |
+        This repository is a self-hosted observability stack (Grafana + Loki +
+        Prometheus + blackbox_exporter) running in Docker Compose on a Proxmox
+        LXC container. It monitors a Firewalla home network appliance and
+        Proxmox infrastructure. Focus your review on:
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 1
-
-      - name: Run Claude Code Review
-        uses: anthropics/claude-code-action@v1
-        with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          prompt: |
-            REPO: ${{ github.repository }}
-            PR NUMBER: ${{ github.event.pull_request.number }}
-
-            Review this pull request. The PR branch is already checked out.
-
-            This repository is a self-hosted observability stack (Grafana + Loki +
-            Prometheus + blackbox_exporter) running in Docker Compose on a Proxmox
-            LXC container. It monitors a Firewalla home network appliance and
-            Proxmox infrastructure. Focus your review on:
-
-            1. **Docker Compose correctness** — service definitions, volume
-               mounts, port mappings, environment variable references, restart
-               policies, dependency ordering
-            2. **Grafana dashboard JSON** — valid schema v39 format, no
-               __inputs or __requires blocks (provisioned not imported), UID
-               follows firewalla-<n> pattern, datasource references use uid
-               not name
-            3. **Loki config** — valid YAML, retention settings, storage paths,
-               schema version consistency
-            4. **Prometheus config** — valid scrape configs, relabeling rules,
-               target placeholder IPs clearly marked, bearer_token_file paths
-            5. **Secret handling** — passwords and tokens must come from .env
-               or file mounts (ha_token), never hardcoded in committed files;
-               .env and prometheus/ha_token must stay in .gitignore
-            6. **Shell script quality** — if .sh files changed: bash
-               correctness, quoting, error handling, idempotency
-
-            Rules:
-            - Only comment on actual problems or meaningful improvements
-            - Do NOT comment on style, formatting, or naming preferences
-            - Do NOT give positive feedback or praise — just flag issues
-            - Do NOT propose inline fix code — describe the problem and why
-              it matters, not the solution
-            - If nothing significant is wrong, say so in one sentence
-          claude_args: |
-            --max-turns 15
-            --allowedTools "Bash(gh pr diff:*),Bash(gh pr view:*),Read"
+        1. **Docker Compose correctness** — service definitions, volume
+           mounts, port mappings, environment variable references, restart
+           policies, dependency ordering
+        2. **Grafana dashboard JSON** — valid schema v39 format, no
+           __inputs or __requires blocks (provisioned not imported), UID
+           follows firewalla-<n> pattern, datasource references use uid
+           not name
+        3. **Loki config** — valid YAML, retention settings, storage paths,
+           schema version consistency
+        4. **Prometheus config** — valid scrape configs, relabeling rules,
+           target placeholder IPs clearly marked, bearer_token_file paths
+        5. **Secret handling** — passwords and tokens must come from .env
+           or file mounts (ha_token), never hardcoded in committed files;
+           .env and prometheus/ha_token must stay in .gitignore
+        6. **Shell script quality** — if .sh files changed: bash
+           correctness, quoting, error handling, idempotency

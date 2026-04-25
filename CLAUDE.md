@@ -110,5 +110,5 @@ Instance IP filters in CPU/RAM gauge queries match `192.168.139.8.*` (pve) and `
 When implementation is complete, open a pull request as the final step — do not stop at "pushed the branch." The PR is part of the deliverable.
 
 - **PR title**: match or clearly refine the issue title
-- **PR body**: must include `Closes #<number>` so merge automatically closes the issue, plus a short summary of what changed and why
-- **Merging**: do not merge the PR yourself; auto-merge is configured and will handle it once checks pass
+- **PR body**: must include `Closes #<number>` so merge closes the issue, plus a short summary of what changed and why
+- **Merging**: do not merge the PR yourself — auto-merge is configured and will handle it once checks pass

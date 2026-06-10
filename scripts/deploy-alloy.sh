@@ -61,17 +61,20 @@ ALLOY_INSTANCE="${ALLOY_INSTANCE:-${1:-$(hostname -s)}}"
 [[ -n "${ALLOY_INSTANCE}" ]] || fail "ALLOY_INSTANCE is empty — pass the instance label as arg 1."
 info "Instance label: ${ALLOY_INSTANCE}"
 
-for v in GRAFANA_CLOUD_METRICS_URL GRAFANA_CLOUD_METRICS_USER GRAFANA_CLOUD_METRICS_TOKEN; do
+for v in GRAFANA_CLOUD_METRICS_URL GRAFANA_CLOUD_METRICS_USER GRAFANA_CLOUD_METRICS_TOKEN \
+  GRAFANA_CLOUD_LOGS_URL GRAFANA_CLOUD_LOGS_USER GRAFANA_CLOUD_LOGS_TOKEN; do
   [[ -n "${!v:-}" ]] || fail "Required env var ${v} is not set — 'source .envrc' first."
 done
 
 # Catch un-expanded placeholders (e.g. a single-quoted '$GRAFANA_...' that never
-# expanded) before we write bad creds. The URL is non-secret, safe to echo.
-case "${GRAFANA_CLOUD_METRICS_URL}" in
-  https://*) ;;
-  *) fail "GRAFANA_CLOUD_METRICS_URL is '${GRAFANA_CLOUD_METRICS_URL}', not an https URL — the var didn't expand. Run from the repo with '.envrc' sourced." ;;
-esac
-case "${GRAFANA_CLOUD_METRICS_URL}${GRAFANA_CLOUD_METRICS_USER}${GRAFANA_CLOUD_METRICS_TOKEN}" in
+# expanded) before we write bad creds. The URLs are non-secret, safe to echo.
+for u in GRAFANA_CLOUD_METRICS_URL GRAFANA_CLOUD_LOGS_URL; do
+  case "${!u}" in
+    https://*) ;;
+    *) fail "${u} is '${!u}', not an https URL — the var didn't expand. Run from the repo with '.envrc' sourced." ;;
+  esac
+done
+case "${GRAFANA_CLOUD_METRICS_URL}${GRAFANA_CLOUD_METRICS_USER}${GRAFANA_CLOUD_METRICS_TOKEN}${GRAFANA_CLOUD_LOGS_URL}${GRAFANA_CLOUD_LOGS_USER}${GRAFANA_CLOUD_LOGS_TOKEN}" in
   *'$'*) fail "A Grafana Cloud credential contains a literal '\$' — the env vars weren't expanded. Source '.envrc' and pass real values, not single-quoted placeholders." ;;
 esac
 
@@ -149,16 +152,18 @@ ${SUDO} tee /etc/alloy/config.alloy >/dev/null <<'ALLOY_EOF'
 // Managed by scripts/deploy-alloy.sh in PitziLabs/homelab-observability —
 // edit there, re-run the script; do NOT hand-edit on the host.
 //
-// Scrapes the node_exporter on localhost:9100 and remote_writes to Grafana
-// Cloud Mimir at 15s. Labels (job="node", instance from $ALLOY_INSTANCE) match
-// the central scrape, so dashboards and queries are unchanged. Secrets and the
-// instance label come from /etc/default/alloy (0600), never from git.
+// Metrics: scrapes node_exporter on localhost:9100 → remote_write to Mimir @15s
+// (job="node", instance from $ALLOY_INSTANCE).
+// Logs: ships this host's systemd journal → Grafana Cloud Loki
+// (job="systemd-journal", host from $ALLOY_INSTANCE, cluster="homelab").
+// Secrets + instance label come from /etc/default/alloy (0600), never from git.
 
 logging {
   level  = "info"
   format = "logfmt"
 }
 
+// ---- metrics ----
 prometheus.scrape "node" {
   targets = [
     { __address__ = "127.0.0.1:9100", instance = sys.env("ALLOY_INSTANCE") },
@@ -174,6 +179,48 @@ prometheus.remote_write "cloud" {
     basic_auth {
       username = sys.env("GRAFANA_CLOUD_METRICS_USER")
       password = sys.env("GRAFANA_CLOUD_METRICS_TOKEN")
+    }
+  }
+  external_labels = {
+    cluster = "homelab",
+  }
+}
+
+// ---- logs: systemd journal → Loki ----
+loki.source.journal "host" {
+  forward_to    = [loki.write.logs.receiver]
+  relabel_rules = loki.relabel.journal.rules
+  labels        = { job = "systemd-journal", host = sys.env("ALLOY_INSTANCE") }
+  max_age       = "12h"
+}
+
+// Keep Loki stream cardinality bounded: only a few low-cardinality labels.
+// `unit` is set only for real *.service units (transient run-*/session-*/*.scope
+// units are left unlabelled); debug-priority lines are dropped.
+loki.relabel "journal" {
+  forward_to = []
+  rule {
+    source_labels = ["__journal_priority_keyword"]
+    target_label  = "level"
+  }
+  rule {
+    source_labels = ["__journal__systemd_unit"]
+    regex         = "(.+\\.service)"
+    target_label  = "unit"
+  }
+  rule {
+    source_labels = ["__journal_priority"]
+    regex         = "7"
+    action        = "drop"
+  }
+}
+
+loki.write "logs" {
+  endpoint {
+    url = sys.env("GRAFANA_CLOUD_LOGS_URL")
+    basic_auth {
+      username = sys.env("GRAFANA_CLOUD_LOGS_USER")
+      password = sys.env("GRAFANA_CLOUD_LOGS_TOKEN")
     }
   }
   external_labels = {
@@ -197,9 +244,18 @@ ALLOY_INSTANCE="${ALLOY_INSTANCE}"
 GRAFANA_CLOUD_METRICS_URL="${GRAFANA_CLOUD_METRICS_URL}"
 GRAFANA_CLOUD_METRICS_USER="${GRAFANA_CLOUD_METRICS_USER}"
 GRAFANA_CLOUD_METRICS_TOKEN="${GRAFANA_CLOUD_METRICS_TOKEN}"
+GRAFANA_CLOUD_LOGS_URL="${GRAFANA_CLOUD_LOGS_URL}"
+GRAFANA_CLOUD_LOGS_USER="${GRAFANA_CLOUD_LOGS_USER}"
+GRAFANA_CLOUD_LOGS_TOKEN="${GRAFANA_CLOUD_LOGS_TOKEN}"
 ENV_EOF
 ${SUDO} chown root:root /etc/default/alloy
 ${SUDO} chmod 0600 /etc/default/alloy
+
+# The alloy service runs as user 'alloy'; it needs the systemd-journal group to
+# read the journal for loki.source.journal. Idempotent; takes effect on restart.
+if getent group systemd-journal >/dev/null 2>&1; then
+  ${SUDO} usermod -aG systemd-journal alloy 2>/dev/null || true
+fi
 
 # ---------------------------------------------------------------------------
 # Enable + (re)start
@@ -226,7 +282,7 @@ for _ in $(seq 1 10); do
   sleep 1
 done
 if [[ "${READY}" == true ]]; then
-  success "Alloy is ready and shipping metrics."
+  success "Alloy is ready — shipping metrics (Mimir) + journald logs (Loki)."
 else
   warn "Alloy ready endpoint did not respond — check 'journalctl -u alloy -n 50'."
 fi
@@ -236,8 +292,7 @@ fi
 # ---------------------------------------------------------------------------
 echo ""
 echo -e "${GREEN}============================================================${NC}"
-echo -e "${GREEN} Alloy host-agent running on '${ALLOY_INSTANCE}' (push @ 15s).${NC}"
-echo -e "${YELLOW} NEXT: remove '${ALLOY_INSTANCE}' from the central${NC}"
-echo -e "${YELLOW}       prometheus.scrape \"node\" block in alloy/config.alloy${NC}"
-echo -e "${YELLOW}       on LXC 105, or its series will be scraped twice.${NC}"
+echo -e "${GREEN} Alloy host-agent on '${ALLOY_INSTANCE}': metrics @15s + journald logs.${NC}"
+echo -e "${YELLOW} If this host is NEW: remove it from the central prometheus.scrape${NC}"
+echo -e "${YELLOW} \"node\" block in alloy/config.alloy (else its metrics double-scrape).${NC}"
 echo -e "${GREEN}============================================================${NC}"

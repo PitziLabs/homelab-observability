@@ -35,12 +35,15 @@ flowchart LR
   end
 
   display["Office Display<br/>public dashboard share"]
+  axiom[("Axiom<br/>Zeek/ACL, 30d")]
 
   agent -- "remote_write 15s · job=node" --> mimir
+  agent -- "journald · job=systemd-journal" --> lokidb
   haos --> hascrape
   bb -- "remote_write · job=integrations/blackbox/*" --> mimir
   hascrape -- "remote_write · job=homeassistant" --> mimir
   fw -- "Loki push" --> lokirecv
+  fw -. "Zeek/ACL (primary)" .-> axiom
   lokirecv -- "loki.write" --> lokidb
   grafana --> display
 
@@ -49,7 +52,7 @@ flowchart LR
   classDef sink fill:#1d3b6b,stroke:#5b8def,color:#fff;
   class ne,agent,bb,hascrape,haos metric;
   class fw,lokirecv logs;
-  class mimir,lokidb,grafana,display sink;
+  class mimir,lokidb,grafana,display,axiom sink;
 ```
 
 ## The paths
@@ -71,10 +74,18 @@ key LAN IPs + endpoints and `remote_write`s them as
 per-entity export noise — see README § "HA export trim"), and `remote_write`s
 the rest as `job="homeassistant"`.
 
-**Logs (central).** The Firewalla's Promtail pushes Zeek (DNS/conn) and ACL
-logs to the central Alloy's `loki.source.api` on `:3100`; Alloy's `loki.write`
-forwards to Grafana Cloud Loki with `cluster="homelab"`. *(Log shipping is the
-next area to align.)*
+**Host logs (push).** Each host's Alloy agent also ships its **systemd journal**
+to Grafana Cloud Loki via `loki.source.journal` → `loki.write` (`job="systemd-journal"`,
+`host="<instance>"`, `cluster="homelab"`; `level` and — for real `*.service`
+units — `unit` are promoted as labels; debug-priority lines are dropped to bound
+volume). Same push model as metrics; no central relay, no HA in the path. Added
+by `scripts/deploy-alloy.sh`.
+
+**Firewalla logs (security).** The Firewalla's Fluent Bit ships Zeek (DNS/conn/SSL)
+and ACL logs to **Axiom** (primary, 30-day retention — high-volume security
+logs). It also pushes to the central Alloy's `loki.source.api` on `:3100`
+(→ `loki.write` → Cloud Loki) for live dashboards. *(Split by purpose: Loki =
+host/infra ops logs, Axiom = high-volume security logs.)*
 
 **Consumption.** Dashboards (Terraform-managed, `dashboards/*.json`) and Explore
 read Mimir + Loki. The public **Office Display** is a shared dashboard.
@@ -86,7 +97,8 @@ read Mimir + Loki. The public **Office Display** is a shared dashboard.
 | Host node_exporter (push) | `node` | `instance` ∈ {neptune, pve, pve2, pve3, pve4, pve5} |
 | Blackbox probe | `integrations/blackbox/<target>` | — |
 | Home Assistant | `homeassistant` | `entity`, `friendly_name`, `domain` |
-| Firewalla logs (Loki) | — | `log_source` ∈ {zeek_dns, zeek_conn, zeek_ssl, firewalla_acl}, `cluster="homelab"` |
+| Host journald (Loki) | `systemd-journal` | `host`, `level`, `unit` (services only), `cluster="homelab"` |
+| Firewalla logs (Loki + Axiom) | `firewalla` | `log_source` ∈ {zeek_dns, zeek_conn, zeek_ssl, firewalla_acl}, `cluster="homelab"` |
 
 ## Deploy flow (config → collectors)
 

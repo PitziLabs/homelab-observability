@@ -3,19 +3,25 @@ locals {
 
   # Dashboard JSON in the repo references the original self-hosted datasource
   # UIDs ("loki" and "prometheus"). On Grafana Cloud the pitzilabs stack
-  # auto-provisions datasources with a stack-name prefix. We rewrite at apply
-  # time so the JSON files stay portable.
+  # auto-provisions datasources whose *UID* is "grafanacloud-<service>"
+  # (logs / prom / infinity). The stack-name prefix ("grafanacloud-pitzilabs-*")
+  # appears in the datasource *name*, NOT its UID — panels reference datasources
+  # by UID, so we must rewrite to the UID, not the name. We rewrite at apply time
+  # so the JSON files stay portable.
   #
-  # To verify the UIDs on a live stack:
+  # To verify the UIDs on a live stack (note: read .uid, not .name):
   #   curl -s -H "Authorization: Bearer $GRAFANA_AUTH" $GRAFANA_URL/api/datasources \
   #     | jq '.[] | {uid, name}'
-  # infinity has no stack-name prefix on Cloud (uid is "grafanacloud-infinity"),
-  # but we keep the JSON portable with a bare "infinity" placeholder and rewrite
-  # it here, mirroring loki/prometheus. Used by the claude-runner-fleet dashboard's
-  # live open-PR panel (GitHub Search API).
+  #
+  # History: loki/prometheus were previously rewritten to the *name*
+  # ("grafanacloud-pitzilabs-{logs,prom}"), which are non-existent UIDs. Prom
+  # panels still rendered because the Prometheus datasource is the stack default,
+  # so a dangling UID silently fell back to it; all-Loki dashboards (e.g.
+  # claude-runner-fleet) showed "No data" because the fallback default is
+  # Prometheus, which can't run LogQL. infinity was already correct.
   datasource_uid_rewrites = {
-    "loki"       = "grafanacloud-pitzilabs-logs"
-    "prometheus" = "grafanacloud-pitzilabs-prom"
+    "loki"       = "grafanacloud-logs"
+    "prometheus" = "grafanacloud-prom"
     "infinity"   = "grafanacloud-infinity"
   }
 

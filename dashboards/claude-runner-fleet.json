@@ -87,7 +87,7 @@
             "uid": "loki"
           },
           "queryType": "instant",
-          "expr": "sum(count_over_time({job=\"claude_runner\", project=~\"$project\"} | json | event=\"job_complete\" [$__range]))"
+          "expr": "sum(count_over_time({job=\"claude_runner\", project=~\"$project\"} | json | event=\"job_complete\" [$__range])) or vector(0)"
         }
       ]
     },
@@ -131,7 +131,7 @@
             "uid": "loki"
           },
           "queryType": "instant",
-          "expr": "sum(sum_over_time({job=\"claude_runner\", project=~\"$project\"} | json | event=\"job_complete\" | unwrap cost_usd [$__range]))"
+          "expr": "sum(sum_over_time({job=\"claude_runner\", project=~\"$project\"} | json | event=\"job_complete\" | unwrap cost_usd [$__range])) or vector(0)"
         }
       ]
     },
@@ -190,7 +190,7 @@
             "uid": "loki"
           },
           "queryType": "instant",
-          "expr": "sum(count_over_time({job=\"claude_runner\", status=\"success\", project=~\"$project\"} | json | event=\"job_complete\" [$__range])) / sum(count_over_time({job=\"claude_runner\", project=~\"$project\"} | json | event=\"job_complete\" [$__range]))"
+          "expr": "sum(count_over_time({job=\"claude_runner\", status=\"success\", project=~\"$project\"} | json | event=\"job_complete\" [$__range])) / sum(count_over_time({job=\"claude_runner\", project=~\"$project\"} | json | event=\"job_complete\" [$__range])) or vector(1)"
         }
       ]
     },
@@ -233,7 +233,7 @@
             "uid": "loki"
           },
           "queryType": "instant",
-          "expr": "sum(count_over_time({job=\"claude_runner\", project=~\"$project\"} | json | event=\"job_complete\" | pr_url!=\"\" [$__range]))"
+          "expr": "sum(count_over_time({job=\"claude_runner\", project=~\"$project\"} | json | event=\"job_complete\" | pr_url!=\"\" [$__range])) or vector(0)"
         }
       ]
     },
@@ -271,7 +271,7 @@
             "uid": "loki"
           },
           "queryType": "range",
-          "expr": "sum by (status) (count_over_time({job=\"claude_runner\", project=~\"$project\"} | json | event=\"job_complete\" [$__auto]))",
+          "expr": "sum by (status) (count_over_time({job=\"claude_runner\", project=~\"$project\"} | json | event=\"job_complete\" [$__auto])) or vector(0)",
           "legendFormat": "{{status}}"
         }
       ]
@@ -310,7 +310,7 @@
             "uid": "loki"
           },
           "queryType": "range",
-          "expr": "sum by (project) (sum_over_time({job=\"claude_runner\", project=~\"$project\"} | json | event=\"job_complete\" | unwrap cost_usd [$__auto]))",
+          "expr": "sum by (project) (sum_over_time({job=\"claude_runner\", project=~\"$project\"} | json | event=\"job_complete\" | unwrap cost_usd [$__auto])) or vector(0)",
           "legendFormat": "{{project}}"
         }
       ]
@@ -347,7 +347,7 @@
             "uid": "loki"
           },
           "queryType": "range",
-          "expr": "avg_over_time({job=\"claude_runner\", project=~\"$project\"} | json | event=\"job_complete\" | unwrap duration_sec [$__auto])",
+          "expr": "avg_over_time({job=\"claude_runner\", project=~\"$project\"} | json | event=\"job_complete\" | unwrap duration_sec [$__auto]) or vector(0)",
           "legendFormat": "avg"
         },
         {
@@ -357,7 +357,7 @@
             "uid": "loki"
           },
           "queryType": "range",
-          "expr": "max_over_time({job=\"claude_runner\", project=~\"$project\"} | json | event=\"job_complete\" | unwrap duration_sec [$__auto])",
+          "expr": "max_over_time({job=\"claude_runner\", project=~\"$project\"} | json | event=\"job_complete\" | unwrap duration_sec [$__auto]) or vector(0)",
           "legendFormat": "max"
         }
       ]
@@ -601,7 +601,7 @@
             "uid": "loki"
           },
           "queryType": "instant",
-          "expr": "sum(count_over_time({job=\"claude_local\"} | json | event=\"session_complete\" [$__range]))"
+          "expr": "sum(count_over_time({job=\"claude_local\"} | json | event=\"session_complete\" [$__range])) or vector(0)"
         }
       ]
     },
@@ -645,7 +645,7 @@
             "uid": "loki"
           },
           "queryType": "instant",
-          "expr": "sum(sum_over_time({job=\"claude_local\"} | json | event=\"session_complete\" | unwrap cost_usd [$__range]))"
+          "expr": "sum(sum_over_time({job=\"claude_local\"} | json | event=\"session_complete\" | unwrap cost_usd [$__range])) or vector(0)"
         }
       ]
     },
@@ -688,7 +688,7 @@
             "uid": "loki"
           },
           "queryType": "instant",
-          "expr": "sum(sum_over_time({job=\"claude_local\"} | json | event=\"session_complete\" | unwrap num_turns [$__range]))"
+          "expr": "sum(sum_over_time({job=\"claude_local\"} | json | event=\"session_complete\" | unwrap num_turns [$__range])) or vector(0)"
         }
       ]
     },
@@ -731,7 +731,7 @@
             "uid": "loki"
           },
           "queryType": "instant",
-          "expr": "sum(sum_over_time({job=\"claude_local\"} | json | event=\"session_complete\" | unwrap output_tokens [$__range]))"
+          "expr": "sum(sum_over_time({job=\"claude_local\"} | json | event=\"session_complete\" | unwrap output_tokens [$__range])) or vector(0)"
         }
       ]
     },
@@ -769,7 +769,7 @@
             "uid": "loki"
           },
           "queryType": "range",
-          "expr": "sum by (project) (sum_over_time({job=\"claude_local\"} | json | event=\"session_complete\" | unwrap cost_usd [$__auto]))",
+          "expr": "sum by (project) (sum_over_time({job=\"claude_local\"} | json | event=\"session_complete\" | unwrap cost_usd [$__auto])) or vector(0)",
           "legendFormat": "{{project}}"
         }
       ]
@@ -808,7 +808,7 @@
             "uid": "loki"
           },
           "queryType": "range",
-          "expr": "sum by (worker) (sum_over_time({job=\"claude_local\"} | json | event=\"session_complete\" | unwrap cost_usd [$__auto]))",
+          "expr": "sum by (worker) (sum_over_time({job=\"claude_local\"} | json | event=\"session_complete\" | unwrap cost_usd [$__auto])) or vector(0)",
           "legendFormat": "{{worker}}"
         }
       ]

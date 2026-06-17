@@ -53,10 +53,10 @@
       "type": "stat",
       "title": "Jobs (range)",
       "gridPos": {
-        "h": 4,
-        "w": 6,
         "x": 0,
-        "y": 0
+        "y": 6,
+        "w": 6,
+        "h": 4
       },
       "datasource": {
         "type": "loki",
@@ -96,10 +96,10 @@
       "type": "stat",
       "title": "Spend (range)",
       "gridPos": {
-        "h": 4,
-        "w": 6,
         "x": 6,
-        "y": 0
+        "y": 6,
+        "w": 6,
+        "h": 4
       },
       "datasource": {
         "type": "loki",
@@ -140,10 +140,10 @@
       "type": "stat",
       "title": "Success rate",
       "gridPos": {
-        "h": 4,
-        "w": 6,
         "x": 12,
-        "y": 0
+        "y": 6,
+        "w": 6,
+        "h": 4
       },
       "datasource": {
         "type": "loki",
@@ -199,10 +199,10 @@
       "type": "stat",
       "title": "PRs opened (range)",
       "gridPos": {
-        "h": 4,
-        "w": 6,
         "x": 18,
-        "y": 0
+        "y": 6,
+        "w": 6,
+        "h": 4
       },
       "datasource": {
         "type": "loki",
@@ -242,10 +242,10 @@
       "type": "timeseries",
       "title": "Jobs over time by status",
       "gridPos": {
-        "h": 8,
-        "w": 12,
         "x": 0,
-        "y": 4
+        "y": 10,
+        "w": 24,
+        "h": 8
       },
       "datasource": {
         "type": "loki",
@@ -281,10 +281,10 @@
       "type": "timeseries",
       "title": "Spend over time by project",
       "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 4
+        "x": 0,
+        "y": 18,
+        "w": 24,
+        "h": 8
       },
       "datasource": {
         "type": "loki",
@@ -320,10 +320,10 @@
       "type": "timeseries",
       "title": "Job duration (avg / max)",
       "gridPos": {
-        "h": 8,
-        "w": 12,
         "x": 0,
-        "y": 12
+        "y": 26,
+        "w": 24,
+        "h": 8
       },
       "datasource": {
         "type": "loki",
@@ -367,10 +367,10 @@
       "type": "logs",
       "title": "Recent jobs",
       "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 12
+        "x": 0,
+        "y": 34,
+        "w": 24,
+        "h": 8
       },
       "datasource": {
         "type": "loki",
@@ -399,10 +399,10 @@
       "title": "Runners underway",
       "description": "Per-worker busy signal from the bullpen run-job heartbeat (event=\"job_running\", pushed to Loki every ~30s while a job is in flight). Stacked: each running worker contributes 1, so the band height is the number of runners underway at once and each colored layer is one worker. Gaps (height 0) are idle. Empty until the heartbeat ships from the workers and a job runs.",
       "gridPos": {
-        "h": 6,
-        "w": 24,
         "x": 0,
-        "y": 20
+        "y": 0,
+        "w": 24,
+        "h": 6
       },
       "datasource": {
         "type": "loki",
@@ -458,10 +458,10 @@
       "title": "Open agent PRs (awaiting local review)",
       "description": "Live open-PR review queue from the GitHub Search API via the Infinity datasource: currently-open PRs authored by pitzilabs-claude-runner[bot] across the PitziLabs org, oldest first. Reflects real state — merged/closed PRs drop off. The Loki job_complete stream records pr_url only at open time and never observes the later merge, so it cannot track which PRs are still open.",
       "gridPos": {
-        "h": 7,
-        "w": 24,
         "x": 0,
-        "y": 26
+        "y": 42,
+        "w": 24,
+        "h": 7
       },
       "datasource": {
         "type": "yesoreyeram-infinity-datasource",
@@ -615,10 +615,10 @@
       "title": "Local sessions \u2014 interactive (source=\"local\")",
       "collapsed": false,
       "gridPos": {
-        "h": 1,
-        "w": 24,
         "x": 0,
-        "y": 33
+        "y": 49,
+        "w": 24,
+        "h": 1
       }
     },
     {
@@ -626,10 +626,10 @@
       "type": "stat",
       "title": "Local sessions (range)",
       "gridPos": {
-        "h": 4,
-        "w": 6,
         "x": 0,
-        "y": 34
+        "y": 50,
+        "w": 6,
+        "h": 4
       },
       "datasource": {
         "type": "loki",
@@ -669,10 +669,10 @@
       "type": "stat",
       "title": "Local spend (range)",
       "gridPos": {
-        "h": 4,
-        "w": 6,
         "x": 6,
-        "y": 34
+        "y": 50,
+        "w": 6,
+        "h": 4
       },
       "datasource": {
         "type": "loki",
@@ -713,10 +713,10 @@
       "type": "stat",
       "title": "Local turns (range)",
       "gridPos": {
-        "h": 4,
-        "w": 6,
         "x": 12,
-        "y": 34
+        "y": 50,
+        "w": 6,
+        "h": 4
       },
       "datasource": {
         "type": "loki",
@@ -756,10 +756,10 @@
       "type": "stat",
       "title": "Output tokens (range)",
       "gridPos": {
-        "h": 4,
-        "w": 6,
         "x": 18,
-        "y": 34
+        "y": 50,
+        "w": 6,
+        "h": 4
       },
       "datasource": {
         "type": "loki",
@@ -799,10 +799,10 @@
       "type": "timeseries",
       "title": "Local spend over time by project",
       "gridPos": {
-        "h": 8,
-        "w": 12,
         "x": 0,
-        "y": 38
+        "y": 54,
+        "w": 24,
+        "h": 8
       },
       "datasource": {
         "type": "loki",
@@ -838,10 +838,10 @@
       "type": "timeseries",
       "title": "Local spend over time by worker",
       "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 38
+        "x": 0,
+        "y": 62,
+        "w": 24,
+        "h": 8
       },
       "datasource": {
         "type": "loki",
@@ -877,10 +877,10 @@
       "type": "logs",
       "title": "Recent local sessions",
       "gridPos": {
-        "h": 8,
-        "w": 24,
         "x": 0,
-        "y": 46
+        "y": 70,
+        "w": 24,
+        "h": 8
       },
       "datasource": {
         "type": "loki",

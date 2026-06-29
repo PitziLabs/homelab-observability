@@ -53,7 +53,7 @@ The four active log streams, keyed by `log_source`:
 | `firewalla_acl` | Firewalla ACL alarm events — blocked/allowed flows, rule name, severity. |
 
 **Change coordination:** the Firewalla side of this pipeline lives in
-[PitziLabs/firewalla-axiom-pipeline](https://github.com/PitziLabs/firewalla-axiom-pipeline).
+[lentago/firewalla-axiom-pipeline](https://github.com/lentago/firewalla-axiom-pipeline).
 Any change to the `log_source` values or the push endpoint above must be
 coordinated with that repo (see its issue #42, which shipped the current label
 scheme) so both sides stay in sync.
@@ -277,7 +277,7 @@ source .envrc   # exports GRAFANA_CLOUD_LOGS_*
 
 It runs as a dedicated `alloy-transcript.service` under the `claude` user (the
 session files are `0600 claude:claude`). **Egress is deliberately scrubbed**
-(see [#71](https://github.com/PitziLabs/homelab-observability/issues/71)): only
+(see [#71](https://github.com/lentago/homelab-observability/issues/71)): only
 `assistant` text + tool *names* are shipped — `thinking` blocks, tool *inputs*,
 and `user`/tool-result lines (raw repo contents) never leave the LAN. A `runid`
 label is a possible future bullpen-side fast-follow.
